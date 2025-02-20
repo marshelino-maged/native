@@ -7,6 +7,7 @@ headers:
     - 'src/include/dart_api_dl.h'
     - 'src/objective_c.h'
     - 'src/objective_c_runtime.h'
+    - 'src/os_version.h'
 ffi-native:
   assetId: 'objective_c.framework/objective_c'
 exclude-all-by-default: true
@@ -20,7 +21,6 @@ functions:
     - 'sel_getName'
     - 'protocol_getMethodDescription'
     - 'protocol_getName'
-    - 'Dart_InitializeApiDL'
     - 'newFinalizableHandle'
     - 'DOBJC_.*'
   leaf:
@@ -42,6 +42,7 @@ functions:
     'DOBJC_newWaiter': 'newWaiter'
     'DOBJC_signalWaiter': 'signalWaiter'
     'DOBJC_awaitWaiter': 'awaitWaiter'
+    'DOBJC_getOsVesion': 'getOsVesion'
     'sel_registerName': 'registerName'
     'sel_getName': 'getName'
     'objc_getClass': 'getClass'
@@ -69,6 +70,9 @@ structs:
   rename:
     '_ObjC(.*)': 'ObjC$1'
     '_Dart_FinalizableHandle': 'Dart_FinalizableHandle_'
+macros:
+  include:
+    - 'ILLEGAL_PORT'
 preamble: |
   // Copyright (c) 2024, the Dart project authors. Please see the AUTHORS file
   // for details. All rights reserved. Use of this source code is governed by a

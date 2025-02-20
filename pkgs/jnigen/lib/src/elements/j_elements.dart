@@ -62,18 +62,20 @@ class Method implements Element {
 
   final ast.Method _method;
 
-  bool get isExcluded => _method.isExcluded;
-  set isExcluded(bool value) => _method.isExcluded = value;
+  bool get isExcluded => _method.userDefinedIsExcluded;
+  set isExcluded(bool value) => _method.userDefinedIsExcluded = value;
 
   String get name => _method.userDefinedName ?? _method.name;
   set name(String newName) => _method.userDefinedName = newName;
 
   String get originalName => _method.name;
 
+  bool get isConstructor => _method.isConstructor;
+
   @override
   void accept(Visitor visitor) {
     visitor.visitMethod(this);
-    if (_method.isExcluded) return;
+    if (_method.userDefinedIsExcluded) return;
     for (final param in _method.params) {
       Param(param).accept(visitor);
     }

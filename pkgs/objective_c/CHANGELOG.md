@@ -1,4 +1,12 @@
-## 5.0.0-wip
+## 7.0.0-wip
+
+- Use ffigen 18.0.0
+
+## 6.0.0
+
+- Use ffigen 17.0.0
+
+## 5.0.0
 
 - __Breaking change__: Rename the `NSString` to `String` conversion method from
   `toString()` to `toDartString()`.
@@ -6,6 +14,9 @@
 - Add various ObjC categories (extension methods) to the built in classes.
 - Add various ObjC protocols to the bindings.
 - Make all visible API types public.
+- Add a `osVersion` getter, which returns the current MacOS/iOS version.
+- Fixed [a bug](https://github.com/dart-lang/native/issues/1978) where Dart API
+  symbols could be null despite Dart_InitializeApiDL returning successfully.
 
 ## 4.1.0
 

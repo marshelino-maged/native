@@ -9,8 +9,9 @@ import '../util/find_package.dart';
 class GradleTools {
   static final currentDir = Directory('.');
 
-  // Maven Central root location
-  static String repoLocation = 'https://repo1.maven.org/maven2';
+  // Maven Central and Google Maven root locations
+  static List<String> repos = ['https://repo1.maven.org/maven2',
+    'https://maven.google.com'];
 
   /// Helper method since we can't pass inheritStdio option to [Process.run].
   static Future<int> _runCmd(String exec, List<String> args,
@@ -68,10 +69,19 @@ class GradleTools {
   /// Downloads and unpacks source files of [deps] into [targetDir].
   static Future<void> downloadMavenSources(
       List<MavenDependency> deps, String targetDir) async {
-    for (var i = 0; i < deps.length; i++) {
-      final sourceJarLocation = deps[i].toURLString(repoLocation);
-      await File(join(targetDir, deps[i].filename()))
-          .writeAsBytes(await http.readBytes(Uri.parse(sourceJarLocation)));
+    for (var j = 0; j < repos.length; j++) {
+      var repoLocation = repos[j];
+      for (var i = 0; i < deps.length; i++) {
+        final sourceJarLocation = deps[i].toURLString(repoLocation);
+        // Dependencies can be in any of the repositories
+        try {
+          final bytes = await http.readBytes(Uri.parse(sourceJarLocation));
+          await File(join(targetDir, deps[i].filename()))
+              .writeAsBytes(bytes);
+        } catch(ClientException) {
+
+        }
+      }
     }
     // Use gradle to extract the source jars.
     // This flow is needed because Gradle

@@ -381,7 +381,8 @@ set $setterName($dartType value) {
 List<String> $validateName() => _reader.$jsonValidate('$jsonKey');
 ''');
       default:
-        throw UnimplementedError(itemType.toString());
+      // TODO(dcharkes): Implement this.
+      // throw UnimplementedError(itemType.toString());
     }
   }
 

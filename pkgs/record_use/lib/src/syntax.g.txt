@@ -1,0 +1,339 @@
+SchemaInfo(
+  classes: [
+    NormalClassInfo(
+      name: Arguments,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: constant,
+          jsonKey: constant,
+          type: Constant?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: nonConstant,
+          jsonKey: nonConstant,
+          type: NonConstant?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Call,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: arguments,
+          jsonKey: arguments,
+          type: Arguments?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: definition,
+          jsonKey: definition,
+          type: Definition?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: loadingUnit,
+          jsonKey: loadingUnit,
+          type: String?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: references,
+          jsonKey: references,
+          type: List<Reference>?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Constant,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: named,
+          jsonKey: named,
+          type: Map<String, Object?>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: positional,
+          jsonKey: positional,
+          type: Map<String, Object?>?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Definition,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: id,
+          jsonKey: id,
+          type: int,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: loadingUnit,
+          jsonKey: loadingUnit,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Identifier,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: name,
+          jsonKey: name,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: parent,
+          jsonKey: parent,
+          type: String?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: uri,
+          jsonKey: uri,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Instance,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: instanceConstant,
+          jsonKey: instanceConstant,
+          type: int,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: loadingUnit,
+          jsonKey: loadingUnit,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Metadata,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: comment,
+          jsonKey: comment,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: version,
+          jsonKey: version,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: NonConstant,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: named,
+          jsonKey: named,
+          type: List<Map<String, Object?>?>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: positional,
+          jsonKey: positional,
+          type: List<Map<String, Object?>?>?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: RecordedUses,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: constants,
+          jsonKey: constants,
+          type: List<Constant>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: ids,
+          jsonKey: ids,
+          type: List<Identifier>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: metadata,
+          jsonKey: metadata,
+          type: Metadata,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: usages,
+          jsonKey: usages,
+          type: List<Usage>?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Reference,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: arguments,
+          jsonKey: arguments,
+          type: Arguments,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: loadingUnit,
+          jsonKey: loadingUnit,
+          type: String,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    ),
+    NormalClassInfo(
+      name: Usage,
+      superclassName: null,
+      subclassNames: [  ],
+      properties: [
+        PropertyInfo(
+          name: calls,
+          jsonKey: calls,
+          type: List<Call>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: identifier,
+          jsonKey: identifier,
+          type: int,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: instances,
+          jsonKey: instances,
+          type: List<Instance>?,
+          isOverride: false,
+          setterPrivate: true,
+        ),
+        PropertyInfo(
+          name: loadingUnit,
+          jsonKey: loadingUnit,
+          type: String?,
+          isOverride: false,
+          setterPrivate: true,
+        )
+      ],
+      taggedUnionProperty: null,
+      taggedUnionValue: null,
+      extraValidation: [
+    
+      ],
+    )
+  ]
+)

@@ -1,0 +1,153 @@
+{
+    "$schema": "../../doc/schema/record_use.schema.json",
+    "metadata": {
+        "version": "1.6.2-wip+5.-.2.z",
+        "comment": "Recorded references at compile time and their argument values, as far as known, to definitions annotated with @RecordUse"
+    },
+    "ids": [
+        {
+            "uri": "file://lib/_internal/js_runtime/lib/js_helper.dart",
+            "name": "MyAnnotation"
+        },
+        {
+            "uri": "file://lib/_internal/js_runtime/lib/js_helper.dart",
+            "parent": "MyClass",
+            "name": "get:loadDeferredLibrary"
+        }
+    ],
+    "constants": [
+        {
+            "type": "String",
+            "value": "jenkins"
+        },
+        {
+            "type": "String",
+            "value": "mercury"
+        },
+        {
+            "type": "String",
+            "value": "lib_SHA1"
+        },
+        {
+            "type": "bool",
+            "value": false
+        },
+        {
+            "type": "int",
+            "value": 1
+        },
+        {
+            "type": "String",
+            "value": "camus"
+        },
+        {
+            "type": "String",
+            "value": "einstein"
+        },
+        {
+            "type": "String",
+            "value": "insert"
+        },
+        {
+            "type": "list",
+            "value": [
+                6,
+                7,
+                3
+            ]
+        },
+        {
+            "type": "list",
+            "value": [
+                5,
+                8,
+                6
+            ]
+        },
+        {
+            "type": "int",
+            "value": 0
+        },
+        {
+            "type": "int",
+            "value": 99
+        },
+        {
+            "type": "map",
+            "value": {
+                "key": 11
+            }
+        },
+        {
+            "type": "int",
+            "value": 42
+        },
+        {
+            "type": "Null"
+        },
+        {
+            "type": "Instance",
+            "value": {
+                "a": 13,
+                "b": 14
+            }
+        }
+    ],
+    "usages": [
+        {
+            "identifier": 0,
+            "instances": [
+                {
+                    "instanceConstant": 15,
+                    "loadingUnit": "3"
+                }
+            ]
+        },
+        {
+            "identifier": 1,
+            "calls": [
+                {
+                    "arguments": {
+                        "constant": {
+                            "positional": {
+                                "0": 2,
+                                "1": 3,
+                                "2": 4
+                            },
+                            "named": {
+                                "leroy": 0,
+                                "freddy": 1
+                            }
+                        }
+                    },
+                    "loadingUnit": "o.js"
+                },
+                {
+                    "arguments": {
+                        "constant": {
+                            "positional": {
+                                "0": 2,
+                                "2": 10,
+                                "4": 12
+                            },
+                            "named": {
+                                "leroy": 0,
+                                "albert": 9
+                            }
+                        },
+                        "nonConstant": {
+                            "positional": [
+                                1
+                            ],
+                            "named": [
+                                "freddy"
+                            ]
+                        }
+                    },
+                    "loadingUnit": "o.js"
+                }
+            ],
+            "loadingUnit": "part_15.js"
+        }
+    ]
+}

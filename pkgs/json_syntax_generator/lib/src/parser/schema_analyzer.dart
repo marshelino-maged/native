@@ -372,13 +372,28 @@ class SchemaAnalyzer {
               );
             }
           case SchemaType.object:
-            final typeName = items.className!;
-            _analyzeClass(items);
-            final classInfo = _classes[typeName]!;
-            dartType = ListDartType(
-              itemType: ClassDartType(classInfo: classInfo, isNullable: false),
-              isNullable: !required,
-            );
+            final typeName = items.className;
+            if (typeName != null) {
+              _analyzeClass(items);
+              final classInfo = _classes[typeName]!;
+              dartType = ListDartType(
+                itemType: ClassDartType(
+                  classInfo: classInfo,
+                  isNullable: false,
+                ),
+                isNullable: !required,
+              );
+            } else if (items.generateMapOf) {
+              dartType = const ListDartType(
+                itemType: MapDartType(
+                  valueType: ObjectDartType(isNullable: true),
+                  isNullable: true,
+                ),
+                isNullable: true,
+              );
+            } else {
+              throw UnimplementedError(itemType.toString());
+            }
           default:
             throw UnimplementedError(itemType.toString());
         }

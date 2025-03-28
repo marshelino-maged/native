@@ -1,0 +1,44 @@
+{
+    "$schema": "../../doc/schema/record_use.schema.json",
+    "metadata": {
+        "comment": "Recorded usages of objects tagged with a `RecordUse` annotation",
+        "version": "0.1.0"
+    },
+    "ids": [
+        {
+            "uri": "package:drop_dylib_recording/src/drop_dylib_recording.dart",
+            "name": "getMathMethod"
+        }
+    ],
+    "constants": [
+        {
+            "type": "String",
+            "value": "add"
+        }
+    ],
+    "usages": [
+        {
+            "identifier": 0,
+            "calls": [
+                {
+                    "definition": {
+                        "id": 0,
+                        "loadingUnit": "1"
+                    },
+                    "references": [
+                        {
+                            "arguments": {
+                                "constant": {
+                                    "positional": {
+                                        "0": 0
+                                    }
+                                }
+                            },
+                            "loadingUnit": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

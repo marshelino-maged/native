@@ -1,0 +1,220 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/RecordedUses",
+    "definitions": {
+        "RecordedUses": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "string"
+                        },
+                        "comment": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "version",
+                        "comment"
+                    ]
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    }
+                },
+                "constants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Constant"
+                    }
+                },
+                "usages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Usage"
+                    }
+                }
+            },
+            "required": [
+                "metadata"
+            ]
+        },
+        "Identifier": {
+            "type": "object",
+            "properties": {
+                "uri": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "uri",
+                "name"
+            ]
+        },
+        "Constant": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "String",
+                        "bool",
+                        "int",
+                        "list",
+                        "map",
+                        "Null",
+                        "Instance"
+                    ]
+                },
+                "value": {
+                    "type": [
+                        "string",
+                        "boolean",
+                        "integer",
+                        "array",
+                        "object",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "Instance": {
+            "type": "object",
+            "properties": {
+                "instanceConstant": {
+                    "type": "integer"
+                },
+                "loadingUnit": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "instanceConstant",
+                "loadingUnit"
+            ]
+        },
+        "Arguments": {
+            "type": "object",
+            "properties": {
+                "constant": {
+                    "type": "object",
+                    "properties": {
+                        "positional": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "named": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                },
+                "nonConstant": {
+                    "type": "object",
+                    "properties": {
+                        "positional": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "named": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Reference": {
+            "type": "object",
+            "properties": {
+                "arguments": {
+                    "$ref": "#/definitions/Arguments"
+                },
+                "loadingUnit": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "arguments",
+                "loadingUnit"
+            ]
+        },
+        "Usage": {
+            "type": "object",
+            "properties": {
+                "identifier": {
+                    "type": "integer"
+                },
+                "instances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Instance"
+                    }
+                },
+                "calls": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Call"
+                    }
+                },
+                "loadingUnit": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "identifier"
+            ]
+        },
+        "Call": {
+            "type": "object",
+            "properties": {
+                "arguments": {
+                    "$ref": "#/definitions/Arguments"
+                },
+                "loadingUnit": {
+                    "type": "string"
+                },
+                "definition": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "loadingUnit": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "loadingUnit"
+                    ]
+                },
+                "references": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    }
+                }
+            }
+        }
+    }
+}

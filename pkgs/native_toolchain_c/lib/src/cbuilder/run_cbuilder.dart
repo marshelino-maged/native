@@ -50,6 +50,7 @@ class RunCBuilder {
   final Language language;
   final String? cppLinkStdLib;
   final OptimizationLevel optimizationLevel;
+  final List<Map<String, dynamic>> compilationCommands;
 
   RunCBuilder({
     required this.input,
@@ -73,8 +74,9 @@ class RunCBuilder {
     this.language = Language.c,
     this.cppLinkStdLib,
     required this.optimizationLevel,
-  }) : outDir = input.outputDirectory,
-       assert(
+  })  : outDir = input.outputDirectory,
+        compilationCommands = [],
+        assert(
          [executable, dynamicLibrary, staticLibrary].whereType<Uri>().length ==
              1,
        ) {
@@ -167,24 +169,31 @@ class RunCBuilder {
         codeConfig.targetOS == OS.macOS ? codeConfig.macOS.targetVersion : null;
 
     final architecture = codeConfig.targetArchitecture;
-    final sourceFiles = sources.map((e) => e.toFilePath()).toList();
+    final sourceFilePaths = sources.map((e) => e.toFilePath()).toList();
     final objectFiles = <Uri>[];
+
+    // 1. Compile all sources individually to object files.
+    for (var i = 0; i < sourceFilePaths.length; i++) {
+      final sourceFilePath = sourceFilePaths[i];
+      final objectFile = outDir.resolve('out$i.o');
+      await _compile(
+        tool,
+        architecture,
+        targetAndroidNdkApi,
+        targetIosSdk,
+        targetIOSVersion,
+        targetMacOSVersion,
+        sourceFilePath, // Pass single source file path
+        objectFile, // Output is an object file
+        environment,
+        compileOnly: true, // Indicate this is a compile-only step
+      );
+      objectFiles.add(objectFile);
+    }
+
+    // 2. Link object files or create static library.
     if (staticLibrary != null) {
-      for (var i = 0; i < sourceFiles.length; i++) {
-        final objectFile = outDir.resolve('out$i.o');
-        await _compile(
-          tool,
-          architecture,
-          targetAndroidNdkApi,
-          targetIosSdk,
-          targetIOSVersion,
-          targetMacOSVersion,
-          [sourceFiles[i]],
-          objectFile,
-          environment,
-        );
-        objectFiles.add(objectFile);
-      }
+      // Create static library from object files.
       await runProcess(
         executable: archiver_!,
         arguments: [
@@ -198,21 +207,26 @@ class RunCBuilder {
         environment: environment,
       );
     } else {
-      await _compile(
+      // Link object files into an executable or dynamic library.
+      final outputUri = executable != null
+          ? outDir.resolveUri(executable!)
+          : outDir.resolveUri(dynamicLibrary!);
+      await _link(
         tool,
         architecture,
         targetAndroidNdkApi,
         targetIosSdk,
         targetIOSVersion,
         targetMacOSVersion,
-        sourceFiles,
-        dynamicLibrary != null ? outDir.resolveUri(dynamicLibrary!) : null,
+        objectFiles, // Pass object files for linking
+        outputUri, // Final output target
         environment,
       );
     }
   }
 
-  /// [toolInstance] is either a compiler or a linker.
+  /// Compiles a single source file into an object file.
+  /// [toolInstance] must be a compiler.
   Future<void> _compile(
     ToolInstance toolInstance,
     Architecture? architecture,
@@ -220,14 +234,114 @@ class RunCBuilder {
     IOSSdk? targetIosSdk,
     int? targetIOSVersion,
     int? targetMacOSVersion,
-    Iterable<String> sourceFiles,
-    Uri? outFile,
-    Map<String, String> environment,
-  ) async {
+    String sourceFilePath,
+    Uri objectFile,
+    Map<String, String> environment, {
+    required bool compileOnly, // Flag to control behavior/command capture
+  }) async {
+    // Construct the arguments list first.
+    final arguments = <String>[
+      // === Compilation Flags ===
+      if (codeConfig.targetOS == OS.android) ...[
+        '--target='
+            '${androidNdkClangTargetFlags[architecture]!}'
+            '${targetAndroidNdkApi!}',
+        '--sysroot=${androidSysroot(toolInstance).toFilePath()}',
+      ],
+      if (codeConfig.targetOS == OS.windows)
+        '--target=${clangWindowsTargetFlags[architecture]!}',
+      if (codeConfig.targetOS == OS.macOS)
+        '--target=${appleClangMacosTargetFlags[architecture]!}',
+      if (codeConfig.targetOS == OS.iOS)
+        '--target=${appleClangIosTargetFlags[architecture]![targetIosSdk]!}',
+      if (targetIOSVersion != null) '-mios-version-min=$targetIOSVersion',
+      if (targetMacOSVersion != null) '-mmacos-version-min=$targetMacOSVersion',
+      if (codeConfig.targetOS == OS.iOS) ...[
+        '-isysroot',
+        (await iosSdk(targetIosSdk!, logger: logger)).toFilePath(),
+      ],
+      if (codeConfig.targetOS == OS.macOS) ...[
+        '-isysroot',
+        (await macosSdk(logger: logger)).toFilePath(),
+      ],
+      if (pic != null &&
+          toolInstance.tool.isClangLike &&
+          codeConfig.targetOS != OS.windows) ...[
+        if (pic!) ...[
+          // Always use PIC/PIE flags suitable for the final target type,
+          // even when compiling individual object files.
+          if (dynamicLibrary != null) '-fPIC',
+          if (staticLibrary != null) '-fPIC', // Assume linked into PIC/PIE
+          if (executable != null) '-fPIE',
+        ] else ...[
+          '-fno-PIC',
+          '-fno-PIE',
+        ],
+      ],
+      if (std != null) '-std=$std',
+      if (language == Language.cpp) ...[
+        '-x',
+        'c++',
+      ],
+      if (optimizationLevel != OptimizationLevel.unspecified)
+        optimizationLevel.clangFlag(),
+      ...flags,
+      for (final MapEntry(key: name, :value) in defines.entries)
+        if (value == null) '-D$name' else '-D$name=$value',
+      for (final include in includes) '-I${include.toFilePath()}',
+      for (final forcedInclude in forcedIncludes)
+        '-include${forcedInclude.toFilePath()}',
+      // === Input/Output ===
+      '-c', // Compile only flag
+      sourceFilePath,
+      '-o',
+      objectFile.toFilePath(),
+    ];
+
+    // Capture compilation command precisely as requested if it's a compile-only step.
+    if (compileOnly) {
+      // Ensure keys and values match the requirement exactly.
+      final commandMap = {
+        'directory': input.outputDirectory.toFilePath(), // Use input.outputDirectory
+        'file': sourceFilePath, // The single source file for this step
+        'arguments': arguments, // The exact arguments list for runProcess
+      };
+      this.compilationCommands.add(commandMap);
+    }
+
+    // Now run the process with the constructed arguments.
     await runProcess(
       executable: toolInstance.uri,
       environment: environment,
-      arguments: [
+      arguments: arguments,
+      logger: logger,
+      captureOutput: false,
+      throwOnUnexpectedExitCode: true,
+    );
+  }
+
+  /// Links object files into an executable or dynamic library.
+  /// [toolInstance] can be a compiler (acting as linker driver) or a linker.
+  Future<void> _link(
+    ToolInstance toolInstance,
+    Architecture? architecture,
+    int? targetAndroidNdkApi,
+    IOSSdk? targetIosSdk,
+    int? targetIOSVersion,
+    int? targetMacOSVersion,
+    Iterable<Uri> objectFiles, // Changed from sourceFiles
+    Uri outFile, // Changed from optional outFile
+    Map<String, String> environment,
+  ) async {
+    // Determine if the tool is acting as a linker driver (like clang)
+    // or is a direct linker invocation (like ld).
+    final isLinkerDriver = toolInstance.tool.isClangLike;
+    final isLinker = toolInstance.tool.isLdLike;
+
+    final arguments = <String>[
+      // === Target/Sysroot Flags (mostly for compiler driver) ===
+      // Linkers often infer the target or have different flags.
+      if (isLinkerDriver) ...[
         if (codeConfig.targetOS == OS.android) ...[
           '--target='
               '${androidNdkClangTargetFlags[architecture]!}'
@@ -251,101 +365,111 @@ class RunCBuilder {
           '-isysroot',
           (await macosSdk(logger: logger)).toFilePath(),
         ],
-        if (installName != null) ...[
-          '-install_name',
-          installName!.toFilePath(),
-        ],
-        if (pic != null)
-          if (toolInstance.tool.isClangLike &&
-              codeConfig.targetOS != OS.windows) ...[
-            if (pic!) ...[
-              if (dynamicLibrary != null) '-fPIC',
-              // Using PIC for static libraries allows them to be linked into
-              // any executable, but it is not necessarily the best option in
-              // terms of overhead. We would have to know wether the target into
-              // which the static library is linked is PIC, PIE or neither. Then
-              // we could use the same option for the static library.
-              if (staticLibrary != null) '-fPIC',
-              if (executable != null) ...[
-                // Generate position-independent code for executables.
-                '-fPIE',
-                // Tell the linker to generate a position-independent
-                // executable.
-                '-pie',
-              ],
-            ] else ...[
-              // Disable generation of any kind of position-independent code.
-              '-fno-PIC',
-              '-fno-PIE',
-              // Tell the linker to generate a position-dependent executable.
-              if (executable != null) '-no-pie',
-            ],
-          ] else if (toolInstance.tool.isLdLike) ...[
-            if (pic!) ...[
-              if (executable != null) '--pie',
-            ] else ...[
-              if (executable != null) '--no-pie',
-            ],
-          ],
-        if (std != null) '-std=$std',
-        if (language == Language.cpp) ...[
-          '-x',
-          'c++',
-          '-l',
-          cppLinkStdLib ?? defaultCppLinkStdLib[codeConfig.targetOS]!,
-        ],
-        if (optimizationLevel != OptimizationLevel.unspecified)
-          optimizationLevel.clangFlag(),
-        ...linkerOptions?.preSourcesFlags(toolInstance.tool, sourceFiles) ?? [],
-        // Support Android 15 page size by default, can be overridden by
-        // passing [flags].
-        if (codeConfig.targetOS == OS.android) '-Wl,-z,max-page-size=16384',
-        ...flags,
-        for (final MapEntry(key: name, :value) in defines.entries)
-          if (value == null) '-D$name' else '-D$name=$value',
-        for (final include in includes) '-I${include.toFilePath()}',
-        for (final forcedInclude in forcedIncludes)
-          '-include${forcedInclude.toFilePath()}',
-        ...sourceFiles,
-        if (language == Language.objectiveC) ...[
-          for (final framework in frameworks) ...['-framework', framework],
-        ],
-        if (executable != null) ...[
-          '-o',
-          outDir.resolveUri(executable!).toFilePath(),
-        ] else if (dynamicLibrary != null) ...[
-          '--shared',
-          '-o',
-          outFile!.toFilePath(),
-        ] else if (staticLibrary != null) ...[
-          '-c',
-          '-o',
-          outFile!.toFilePath(),
-        ],
-        ...linkerOptions?.postSourcesFlags(toolInstance.tool, sourceFiles) ??
-            [],
-        if (executable != null || dynamicLibrary != null) ...[
-          if (codeConfig.targetOS case OS.android || OS.linux)
-            // During bundling code assets are all placed in the same directory.
-            // Setting this rpath allows the binary to find other code assets
-            // it is linked against.
-            if (linkerOptions != null)
-              '-rpath=\$ORIGIN'
-            else
-              '-Wl,-rpath=\$ORIGIN',
-          for (final directory in libraryDirectories)
-            '-L${directory.toFilePath()}',
-          for (final library in libraries) '-l$library',
-        ],
       ],
+      // === Linker Specific Flags ===
+      if (installName != null) ...[
+        // Clang uses -install_name, ld might use something else or it's implied
+        if (isLinkerDriver) '-install_name',
+        if (isLinkerDriver) installName!.toFilePath(),
+        // Add equivalent for ld if needed and different
+      ],
+      if (pic != null) ...[
+        // Flags for position independence are often passed to the linker driver
+        if (isLinkerDriver) ...[
+          if (pic!) ...[
+            if (executable != null) '-pie', // Request PIE executable
+          ] else ...[
+            if (executable != null) '-no-pie', // Request non-PIE executable
+          ],
+        ] else if (isLinker) ...[
+          // Direct linker flags might differ (e.g., --pie, --no-pie for ld)
+          if (pic!) ...[
+            if (executable != null) '--pie',
+          ] else ...[
+            if (executable != null) '--no-pie',
+          ],
+        ]
+      ],
+      if (language == Language.cpp) ...[
+        // Linker needs C++ library if C++ sources were involved
+        if (isLinkerDriver)
+          '-l${cppLinkStdLib ?? defaultCppLinkStdLib[codeConfig.targetOS]!}',
+        // Linker might need different flag, e.g. -lc++ for ld
+        if (isLinker && codeConfig.targetOS != OS.windows)
+           '-l${cppLinkStdLib ?? defaultCppLinkStdLib[codeConfig.targetOS]!}',
+      ],
+       // Pass optimization flags to linker driver (might affect LTO)
+      if (isLinkerDriver && optimizationLevel != OptimizationLevel.unspecified)
+        optimizationLevel.clangFlag(),
+
+      // Pass linker options pre-sources (now pre-objects)
+      ...linkerOptions?.preSourcesFlags(
+              toolInstance.tool, objectFiles.map((e) => e.path)) ??
+          [],
+
+      // Support Android 15 page size by default, can be overridden by
+      // passing [flags]. Linker flag usually starts with -Wl,
+      if (codeConfig.targetOS == OS.android)
+         isLinkerDriver ? '-Wl,-z,max-page-size=16384' : '-z max-page-size=16384', // Example for ld
+
+      // General flags (some might be linker flags needing -Wl, prefix)
+      // Need careful filtering or prefixing based on tool type
+      ...flags, // TODO: Filter/prefix flags appropriately for linker vs driver
+
+      // === Inputs ===
+      ...objectFiles.map((e) => e.toFilePath()), // Use object files
+
+      // === Libraries and Frameworks ===
+      if (language == Language.objectiveC) ...[
+        // Frameworks are usually handled by the linker driver
+        if (isLinkerDriver)
+          for (final framework in frameworks) ...['-framework', framework],
+      ],
+      // Library search paths
+      for (final directory in libraryDirectories)
+         isLinkerDriver ? '-L${directory.toFilePath()}' : '-L ${directory.toFilePath()}', // ld might need space
+      // Libraries to link
+      for (final library in libraries)
+         isLinkerDriver ? '-l$library' : '-l $library', // ld might need space
+
+      // === Output ===
+      if (dynamicLibrary != null) ...[
+         isLinkerDriver ? '--shared' : '-shared', // ld uses -shared
+      ],
+      isLinkerDriver ? '-o' : '-o', // Both often use -o
+      outFile.toFilePath(),
+
+      // Pass linker options post-sources (now post-objects)
+      ...linkerOptions?.postSourcesFlags(
+              toolInstance.tool, objectFiles.map((e) => e.path)) ??
+          [],
+
+      // === Rpath ===
+      if (codeConfig.targetOS case OS.android || OS.linux)
+        // Setting rpath allows the binary to find other shared libs.
+        if (linkerOptions != null) // Assuming linkerOptions implies linking
+          isLinkerDriver ? '-rpath=\$ORIGIN' : '-rpath \$ORIGIN' // ld might need space
+        else // If not using linkerOptions, assume direct driver call
+          isLinkerDriver ? '-Wl,-rpath=\$ORIGIN' : '-rpath \$ORIGIN', // ld might need space
+    ];
+
+    await runProcess(
+      executable: toolInstance.uri,
+      environment: environment,
+      arguments: arguments,
       logger: logger,
       captureOutput: false,
       throwOnUnexpectedExitCode: true,
     );
   }
 
+  // Remove the placeholder _compile_old method entirely
+  // Future<void> _compile_old(...) async { ... }
+
   Future<void> runCl({required ToolInstance tool}) async {
     final environment = await _resolver.resolveEnvironment(tool);
+    final sourceFilePaths = sources.map((e) => e.toFilePath()).toList();
+    final objectFiles = <Uri>[];
 
     final isStaticLib = staticLibrary != null;
     Uri? archiver_;
@@ -353,49 +477,103 @@ class RunCBuilder {
       archiver_ = await archiver();
     }
 
-    final result = await runProcess(
-      executable: tool.uri,
-      arguments: [
+    // Step 1: Compile all sources individually to object files (.obj)
+    for (var i = 0; i < sourceFilePaths.length; i++) {
+      final sourceFilePath = sourceFilePaths[i];
+      // Use .obj extension for MSVC object files
+      final objectFile = outDir.resolve('out$i.obj');
+
+      final compileArgs = <String>[
+        // Common flags for compilation
         if (optimizationLevel != OptimizationLevel.unspecified)
           optimizationLevel.msvcFlag(),
         if (std != null) '/std:$std',
-        if (language == Language.cpp) '/TP',
-        ...flags,
+        if (language == Language.cpp) '/TP', // Treat file as C++
+        ...flags, // General flags
+        // Defines
         for (final MapEntry(key: name, :value) in defines.entries)
           if (value == null) '/D$name' else '/D$name=$value',
+        // Includes
         for (final directory in includes) '/I${directory.toFilePath()}',
+        // Forced includes
         for (final forcedInclude in forcedIncludes)
           '/FI${forcedInclude.toFilePath()}',
-        if (executable != null) ...[
-          ...sources.map((e) => e.toFilePath()),
-          '/link',
-          '/out:${outDir.resolveUri(executable!).toFilePath()}',
-        ] else if (dynamicLibrary != null) ...[
-          ...sources.map((e) => e.toFilePath()),
-          '/link',
-          '/DLL',
-          '/out:${outDir.resolveUri(dynamicLibrary!).toFilePath()}',
-        ] else if (staticLibrary != null) ...[
-          '/c',
-          ...sources.map((e) => e.toFilePath()),
-        ],
-        if (executable != null || dynamicLibrary != null) ...[
-          for (final directory in libraryDirectories)
-            '/LIBPATH:${directory.toFilePath()}',
-          for (final library in libraries) '$library.lib',
-        ],
-      ],
-      workingDirectory: outDir,
-      environment: environment,
-      logger: logger,
-      captureOutput: false,
-      throwOnUnexpectedExitCode: true,
-    );
+        // Compile flag
+        '/c',
+        // Input source file
+        sourceFilePath,
+        // Output object file path
+        '/Fo${objectFile.toFilePath()}',
+      ];
 
-    if (staticLibrary != null) {
+      // Capture compilation command before running the process
+      final commandMap = {
+        'directory': outDir.toFilePath(), // Use outDir as specified
+        'file': sourceFilePath,
+        'arguments': compileArgs,
+      };
+      this.compilationCommands.add(commandMap);
+
+      // Run compilation for this single file
       await runProcess(
-        executable: archiver_!,
-        arguments: ['/out:${staticLibrary!.toFilePath()}', '*.obj'],
+        executable: tool.uri,
+        arguments: compileArgs,
+        workingDirectory: outDir, // Run compiler in the output directory
+        environment: environment,
+        logger: logger,
+        captureOutput: false,
+        throwOnUnexpectedExitCode: true,
+      );
+
+      objectFiles.add(objectFile);
+    }
+
+    // Step 2: Link object files or create static library
+    if (isStaticLib) {
+      // Archive object files into a static library using lib.exe
+      await runProcess(
+        executable: archiver_!, // Should be lib.exe resolved earlier
+        arguments: [
+          '/out:${outDir.resolveUri(staticLibrary!).toFilePath()}',
+          // Pass the list of generated object files
+          ...objectFiles.map((f) => f.toFilePath()),
+        ],
+        workingDirectory: outDir,
+        environment: environment,
+        logger: logger,
+        captureOutput: false,
+        throwOnUnexpectedExitCode: true,
+      );
+    } else {
+      // Link object files into an executable or dynamic library using cl.exe driver
+      final linkArgs = <String>[
+        // Common flags (passed again to linker driver)
+        if (optimizationLevel != OptimizationLevel.unspecified)
+          optimizationLevel.msvcFlag(),
+        // '/std' and '/TP' might not be needed for linker, but flags could be
+        ...flags,
+        // Input object files - must come before /link
+        ...objectFiles.map((f) => f.toFilePath()),
+        // Linker command
+        '/link',
+        // Output file
+        if (executable != null)
+          '/out:${outDir.resolveUri(executable!).toFilePath()}'
+        else // dynamicLibrary != null
+          '/out:${outDir.resolveUri(dynamicLibrary!).toFilePath()}',
+        // DLL flag if creating dynamic library
+        if (dynamicLibrary != null) '/DLL',
+        // Library paths
+        for (final directory in libraryDirectories)
+          '/LIBPATH:${directory.toFilePath()}',
+        // Link libraries (name only, linker adds .lib)
+        for (final library in libraries) '$library.lib',
+      ];
+
+      // Run the linker via the compiler driver
+      await runProcess(
+        executable: tool.uri, // Use cl.exe as the linker driver
+        arguments: linkArgs,
         workingDirectory: outDir,
         environment: environment,
         logger: logger,
@@ -403,8 +581,7 @@ class RunCBuilder {
         throwOnUnexpectedExitCode: true,
       );
     }
-
-    assert(result.exitCode == 0);
+    // No single 'result' to assert on as compilation/linking are separate steps now
   }
 
   static const androidNdkClangTargetFlags = {

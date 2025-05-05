@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert'; // Added for jsonEncode
 import 'dart:io';
 
 import 'package:code_assets/code_assets.dart';
@@ -199,6 +200,52 @@ class CBuilder extends CTool implements Builder {
       optimizationLevel: optimizationLevel,
     );
     await task.run();
+
+    // === Generate compile_commands.json ===
+    final commands = task.compilationCommands;
+    if (commands.isNotEmpty) {
+      // Determine the pub cache directory.
+      String? pubCacheDir;
+      final pubCacheEnv = Platform.environment['PUB_CACHE'];
+      if (pubCacheEnv != null) {
+        pubCacheDir = pubCacheEnv;
+      } else if (Platform.isWindows) {
+        final appData = Platform.environment['LOCALAPPDATA'];
+        if (appData != null) {
+          pubCacheDir = '$appData\\Pub\\Cache';
+        }
+      } else {
+        final homeDir = Platform.environment['HOME'];
+        if (homeDir != null) {
+          pubCacheDir = '$homeDir/.pub-cache';
+        }
+      }
+
+      // Normalize paths for reliable comparison.
+      final packageRootPath = Uri.file(input.packageRoot.toFilePath()).path;
+      final pubCachePath =
+          pubCacheDir != null ? Uri.file(pubCacheDir).path : null;
+
+      // Check if the package root is outside the pub cache.
+      final bool isOutsidePubCache =
+          pubCachePath == null || !packageRootPath.startsWith(pubCachePath);
+
+      if (isOutsidePubCache) {
+        final outputFile =
+            input.outputDirectory.resolve('compile_commands.json');
+        logger?.info('Writing compile commands to ${outputFile.toFilePath()}');
+        // The commands are already maps, directly encode the list.
+        final jsonString = jsonEncode(commands);
+        await File.fromUri(outputFile).writeAsString(jsonString);
+      } else {
+        logger?.info(
+          'Skipping compile_commands.json generation: Package root '
+          '(${input.packageRoot.toFilePath()}) is inside the pub cache '
+          '($pubCacheDir).',
+        );
+      }
+    }
+    // === End generate compile_commands.json ===
 
     if (assetName != null) {
       for (final route in routing) {

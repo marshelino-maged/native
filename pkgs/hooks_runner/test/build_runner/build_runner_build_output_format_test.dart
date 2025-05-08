@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
@@ -26,19 +28,28 @@ void main() async {
         // Run twice, failures should not be cached and return the same errors.
         for (final _ in [1, 2]) {
           final logMessages = <String>[];
-          final result = await build(
+          final resultEither = await build(
             packageUri,
             createCapturingLogger(logMessages, level: Level.SEVERE),
             dartExecutable,
             buildAssetTypes: [],
           );
           final fullLog = logMessages.join('\n');
-          expect(result, isNull);
+          expect(resultEither.isRight, true,
+              reason: "Expected build to fail, but it succeeded.");
+          final failure = resultEither.rightOrNull!;
+
           if (package == 'wrong_build_output_3') {
             // Should re-execute the process on second run.
             expect(fullLog, contains('build.dart returned with exit code: 1.'));
+            expect(failure.type, FailureType.ProcessExecutionFailed);
+            expect(failure.message,
+                contains('Hook execution failed with exit code 1'));
           } else {
             expect(fullLog, contains('output.json contained a format error.'));
+            expect(failure.type, FailureType.FileOperationFailed);
+            expect(failure.message,
+                contains('Failed to read hook output: format error'));
           }
         }
       });

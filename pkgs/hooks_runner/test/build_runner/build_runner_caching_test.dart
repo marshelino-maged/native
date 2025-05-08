@@ -7,6 +7,9 @@ import 'dart:io';
 
 import 'package:code_assets/code_assets.dart';
 import 'package:hooks_runner/src/build_runner/build_runner.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -24,14 +27,17 @@ void main() async {
 
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
         expect(
           logMessages.join('\n'),
           contains(
@@ -43,18 +49,26 @@ void main() async {
           result.dependencies,
           contains(packageUri.resolve('src/native_add.c')),
         );
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
       }
 
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
         final hookUri = packageUri.resolve('hook/build.dart');
         expect(
           logMessages.join('\n'),
@@ -77,6 +91,11 @@ void main() async {
           result.dependencies,
           contains(packageUri.resolve('src/native_add.c')),
         );
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
       }
     });
   });
@@ -93,13 +112,21 @@ void main() async {
       logMessages.clear();
 
       {
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
         await expectSymbols(
           asset: CodeAsset.fromEncoded(result.encodedAssets.single),
           symbols: ['add'],
@@ -113,13 +140,21 @@ void main() async {
       );
 
       {
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
 
         final cUri = packageUri.resolve('src/').resolve('native_add.c');
         expect(
@@ -149,13 +184,21 @@ void main() async {
       await runPubGet(workingDirectory: packageUri, logger: logger);
       logMessages.clear();
 
-      final result =
-          (await build(
-            packageUri,
-            logger,
-            dartExecutable,
-            buildAssetTypes: [BuildAssetType.code],
-          ))!;
+      final resultEitherInitial = await build(
+        packageUri,
+        logger,
+        dartExecutable,
+        buildAssetTypes: [BuildAssetType.code],
+      );
+      expect(resultEitherInitial.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${resultEitherInitial.rightOrNull?.message}");
+      final resultInitial = resultEitherInitial.leftOrNull!;
+      expect(await resultInitial.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in resultInitial.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
       {
         final compiledHook =
             logMessages
@@ -169,7 +212,7 @@ void main() async {
       }
       logMessages.clear();
       await expectSymbols(
-        asset: CodeAsset.fromEncoded(result.encodedAssets.single),
+        asset: CodeAsset.fromEncoded(resultInitial.encodedAssets.single),
         symbols: ['add'],
       );
 
@@ -179,13 +222,21 @@ void main() async {
       );
 
       {
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEitherModified = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEitherModified.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEitherModified.rightOrNull?.message}");
+        final resultModified = resultEitherModified.leftOrNull!;
+        expect(await resultModified.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in resultModified.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
 
         final hookUri = packageUri.resolve('hook/build.dart');
         expect(
@@ -195,7 +246,7 @@ void main() async {
 
         logMessages.clear();
         await expectSymbols(
-          asset: CodeAsset.fromEncoded(result.encodedAssets.single),
+          asset: CodeAsset.fromEncoded(resultModified.encodedAssets.single),
           symbols: ['add', 'multiply'],
         );
       }
@@ -214,7 +265,7 @@ void main() async {
         await runPubGet(workingDirectory: packageUri, logger: logger);
         logMessages.clear();
 
-        (await build(
+        final initialBuildResultEither = await build(
           packageUri,
           logger,
           dartExecutable,
@@ -225,7 +276,16 @@ void main() async {
                   : filteredEnvironment(
                     NativeAssetsBuildRunner.hookEnvironmentVariablesFilter,
                   ),
-        ))!;
+        );
+        expect(initialBuildResultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${initialBuildResultEither.rightOrNull?.message}");
+        final initialBuildResult = initialBuildResultEither.leftOrNull!;
+        expect(await initialBuildResult.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in initialBuildResult.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
         logMessages.clear();
 
         // Simulate that the environment variables changed by augmenting the
@@ -250,12 +310,21 @@ void main() async {
           jsonEncode(dependenciesContent),
         );
 
-        (await build(
+        final modifiedBuildResultEither = await build(
           packageUri,
           logger,
           dartExecutable,
           buildAssetTypes: [BuildAssetType.code],
-        ))!;
+        );
+        expect(modifiedBuildResultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${modifiedBuildResultEither.rightOrNull?.message}");
+        final modifiedBuildResult = modifiedBuildResultEither.leftOrNull!;
+        expect(await modifiedBuildResult.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in modifiedBuildResult.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
         expect(logMessages.join('\n'), contains('hook.dill'));
         expect(
           logMessages.join('\n'),

@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
@@ -20,14 +22,17 @@ void main() async {
 
       {
         final logMessages = <String>[];
-        final result = await build(
+        final resultEither = await build(
           packageUri,
           createCapturingLogger(logMessages, level: Level.SEVERE),
           dartExecutable,
           buildAssetTypes: [],
         );
         final fullLog = logMessages.join('\n');
-        expect(result, isNull);
+        expect(resultEither.isRight, true,
+            reason: "Expected build to fail, but it succeeded.");
+        final failure = resultEither.rightOrNull!;
+        expect(failure.type, FailureType.BuildFailed); // Or a more specific type if applicable
         expect(
           fullLog,
           contains(
@@ -35,6 +40,10 @@ void main() async {
             'packages: [cyclic_package_1, cyclic_package_2]',
           ),
         );
+        expect(
+            failure.message,
+            contains(
+                'Cyclic dependency for native asset builds in the following packages: [cyclic_package_1, cyclic_package_2]'));
       }
     });
   });

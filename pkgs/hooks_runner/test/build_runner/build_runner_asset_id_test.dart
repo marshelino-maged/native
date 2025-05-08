@@ -2,6 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
@@ -20,18 +23,25 @@ void main() async {
 
       {
         final logMessages = <String>[];
-        final result = await build(
+        final resultEither = await build(
           packageUri,
           createCapturingLogger(logMessages, level: Level.SEVERE),
           dartExecutable,
           buildAssetTypes: [BuildAssetType.code],
         );
         final fullLog = logMessages.join('\n');
-        expect(result, isNull);
+        expect(resultEither.isRight, true,
+            reason: "Expected build to fail, but it succeeded.");
+        final failure = resultEither.rightOrNull!;
+        expect(failure.type, FailureType.OutputValidationFailed);
         expect(
           fullLog,
           contains('does not start with "package:wrong_namespace_asset/"'),
         );
+        expect(
+            failure.message,
+            contains(
+                'Build hook of package:wrong_namespace_asset has invalid output'));
       }
     });
   });
@@ -48,13 +58,21 @@ void main() async {
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
       {
-        final result = await build(
+        final resultEither = await build(
           packageUri,
           logger,
           dartExecutable,
           buildAssetTypes: [BuildAssetType.code],
         );
-        expect(result, isNotNull);
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
       }
     });
   });

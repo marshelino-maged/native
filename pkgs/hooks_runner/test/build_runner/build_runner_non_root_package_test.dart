@@ -4,6 +4,9 @@
 
 import 'dart:io';
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -21,31 +24,43 @@ void main() async {
 
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              runPackageName: 'some_dev_dep',
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          runPackageName: 'some_dev_dep',
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
         expect(result.encodedAssets, isEmpty);
         expect(result.dependencies, isEmpty);
+        // No assets expected, so no allExist check needed here.
       }
 
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              runPackageName: 'native_add',
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          runPackageName: 'native_add',
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
         expect(result.encodedAssets, isNotEmpty);
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
         expect(
           result.dependencies,
           contains(packageUri.resolve('src/native_add.c')),

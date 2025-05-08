@@ -11,6 +11,9 @@ import 'package:hooks/hooks.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
+
+import '../either.dart';
+import '../failure.dart';
 import 'package:yaml/yaml.dart';
 
 import '../dependencies_hash_file/dependencies_hash_file.dart';
@@ -72,7 +75,7 @@ class NativeAssetsBuildRunner {
     return packagesWithHook.map((e) => e.name).toList();
   }
 
-  Future<HookResult?> _checkUserDefines(
+  Future<Either<HookResult, Failure>> _checkUserDefines(
     LoadedUserDefines? loadedUserDefines,
   ) async {
     if (loadedUserDefines?.pubspecErrors.isNotEmpty ?? false) {
@@ -80,14 +83,17 @@ class NativeAssetsBuildRunner {
       for (final error in loadedUserDefines!.pubspecErrors) {
         logger.severe(error);
       }
-      return null;
+      return Right(Failure(
+          type: FailureType.UserDefinesFailed,
+          message: 'pubspec.yaml contains errors',
+          exception: loadedUserDefines.pubspecErrors.join('\n')));
     }
-    return HookResult(
+    return Left(HookResult(
       dependencies: switch (userDefines?.workspacePubspec) {
         null => [],
         final pubspec => [pubspec],
       },
-    );
+    ));
   }
 
   /// This method is invoked by launchers such as dartdev (for `dart run`) and
@@ -99,22 +105,31 @@ class NativeAssetsBuildRunner {
   ///
   /// The base protocol can be extended with [extensions]. See
   /// [ProtocolExtension] for more documentation.
-  Future<BuildResult?> build({
+  Future<Either<BuildResult, Failure>> build({
     required List<ProtocolExtension> extensions,
     required bool linkingEnabled,
   }) async {
     final loadedUserDefines = await _loadedUserDefines;
-    final hookResultUserDefines = await _checkUserDefines(loadedUserDefines);
-    if (hookResultUserDefines == null) {
-      return null;
+    final hookResultUserDefinesEither =
+        await _checkUserDefines(loadedUserDefines);
+    if (hookResultUserDefinesEither.isRight) {
+      return Right(hookResultUserDefinesEither.rightOrNull!);
     }
-    var hookResult = hookResultUserDefines;
+    var hookResult = hookResultUserDefinesEither.leftOrNull!;
 
-    final (buildPlan, packageGraph) = await _makePlan(
+    final planResult = await _makePlan(
       hook: Hook.build,
       buildResult: null,
     );
-    if (buildPlan == null) return null;
+    if (planResult.isRight) {
+      return Right(planResult.rightOrNull!);
+    }
+    final (buildPlan, packageGraph) = planResult.leftOrNull!;
+    if (buildPlan == null) {
+      return Right(Failure(
+          type: FailureType.BuildFailed,
+          message: 'Failed to make build plan.'));
+    }
 
     /// Key is packageName.
     final globalAssetsForBuild = <String, List<EncodedAsset>>{};
@@ -153,13 +168,14 @@ class NativeAssetsBuildRunner {
         for (final e in extensions) ...await e.validateBuildInput(input),
       ];
       if (errors.isNotEmpty) {
-        return _printErrors(
+        return Right(_printErrors(
           'Build input for ${package.name} contains errors',
           errors,
-        );
+          FailureType.InputValidationFailed,
+        ));
       }
 
-      final result = await _runHookForPackageCached(
+      final resultEither = await _runHookForPackageCached(
         Hook.build,
         input,
         (input, output) async => [
@@ -173,8 +189,10 @@ class NativeAssetsBuildRunner {
         buildDirUri,
         outDirUri,
       );
-      if (result == null) return null;
-      final (hookOutput, hookDeps) = result;
+      if (resultEither.isRight) {
+        return Right(resultEither.rightOrNull!);
+      }
+      final (hookOutput, hookDeps) = resultEither.leftOrNull!;
       hookResult = hookResult.copyAdd(hookOutput, hookDeps);
       globalAssetsForBuild[package.name] =
           (hookOutput as BuildOutput).assets.encodedAssetsForBuild;
@@ -183,16 +201,18 @@ class NativeAssetsBuildRunner {
     // We only perform application wide validation in the final result of
     // building all assets (i.e. in the build step if linking is not enabled or
     // in the link step if linking is enableD).
-    if (linkingEnabled) return hookResult;
+    if (linkingEnabled) return Left(hookResult);
 
-    final errors = [
+    final errorsApplicationAssets = [
       for (final e in extensions)
         ...await e.validateApplicationAssets(hookResult.encodedAssets),
     ];
-    if (errors.isEmpty) return hookResult;
+    if (errorsApplicationAssets.isEmpty) return Left(hookResult);
 
-    _printErrors('Application asset verification failed', errors);
-    return null;
+    return Right(_printErrors(
+        'Application asset verification failed',
+        errorsApplicationAssets,
+        FailureType.OutputValidationFailed));
   }
 
   /// This method is invoked by launchers such as dartdev (for `dart run`) and
@@ -204,23 +224,32 @@ class NativeAssetsBuildRunner {
   ///
   /// The base protocol can be extended with [extensions]. See
   /// [ProtocolExtension] for more documentation.
-  Future<LinkResult?> link({
+  Future<Either<LinkResult, Failure>> link({
     required List<ProtocolExtension> extensions,
     Uri? resourceIdentifiers,
     required BuildResult buildResult,
   }) async {
     final loadedUserDefines = await _loadedUserDefines;
-    final hookResultUserDefines = await _checkUserDefines(loadedUserDefines);
-    if (hookResultUserDefines == null) {
-      return null;
+    final hookResultUserDefinesEither =
+        await _checkUserDefines(loadedUserDefines);
+    if (hookResultUserDefinesEither.isRight) {
+      return Right(hookResultUserDefinesEither.rightOrNull!);
     }
-    var linkResult = hookResultUserDefines;
+    var linkResult = hookResultUserDefinesEither.leftOrNull!;
 
-    final (buildPlan, packageGraph) = await _makePlan(
+    final planResult = await _makePlan(
       hook: Hook.link,
       buildResult: buildResult,
     );
-    if (buildPlan == null) return null;
+    if (planResult.isRight) {
+      return Right(planResult.rightOrNull!);
+    }
+    final (buildPlan, packageGraph) = planResult.leftOrNull!;
+    // Unlike build, link plan can be null if there are no packages with link hooks
+    // or no assets to link. This is not a failure.
+    if (buildPlan == null) {
+      return Left(linkResult);
+    }
 
     for (final package in buildPlan) {
       final inputBuilder = LinkInputBuilder();
@@ -254,19 +283,20 @@ class NativeAssetsBuildRunner {
       );
 
       final input = inputBuilder.build();
-      final errors = [
+      final errorsValidation = [
         ...await ProtocolBase.validateLinkInput(input),
         for (final e in extensions) ...await e.validateLinkInput(input),
       ];
-      if (errors.isNotEmpty) {
+      if (errorsValidation.isNotEmpty) {
         print(input.assets.encodedAssets);
-        return _printErrors(
+        return Right(_printErrors(
           'Link input for ${package.name} contains errors',
-          errors,
-        );
+          errorsValidation,
+          FailureType.InputValidationFailed,
+        ));
       }
 
-      final result = await _runHookForPackageCached(
+      final resultEither = await _runHookForPackageCached(
         Hook.link,
         input,
         (input, output) async => [
@@ -280,31 +310,37 @@ class NativeAssetsBuildRunner {
         buildDirUri,
         outDirUri,
       );
-      if (result == null) return null;
-      final (hookOutput, hookDeps) = result;
+      if (resultEither.isRight) {
+        return Right(resultEither.rightOrNull!);
+      }
+      final (hookOutput, hookDeps) = resultEither.leftOrNull!;
       linkResult = linkResult.copyAdd(hookOutput, hookDeps);
     }
 
-    final errors = [
+    final errorsApplicationAssets = [
       for (final e in extensions)
         ...await e.validateApplicationAssets([
           ...buildResult.encodedAssets,
           ...linkResult.encodedAssets,
         ]),
     ];
-    if (errors.isEmpty) return linkResult;
+    if (errorsApplicationAssets.isEmpty) return Left(linkResult);
 
-    _printErrors('Application asset verification failed', errors);
-    return null;
+    return Right(_printErrors(
+        'Application asset verification failed',
+        errorsApplicationAssets,
+        FailureType.OutputValidationFailed));
   }
 
-  Null _printErrors(String message, ValidationErrors errors) {
+  Failure _printErrors(
+      String message, ValidationErrors errors, FailureType failureType) {
     assert(errors.isNotEmpty);
     logger.severe(message);
     for (final error in errors) {
       logger.severe('- $error');
     }
-    return null;
+    return Failure(
+        type: failureType, message: message, exception: errors.join('\n'));
   }
 
   Future<(Uri, Uri, Uri)> _setupDirectories(
@@ -334,14 +370,15 @@ class NativeAssetsBuildRunner {
     return (buildDirUri, outDirUri, outDirSharedUri);
   }
 
-  Future<(HookOutput, List<Uri>)?> _runHookForPackageCached(
+  Future<Either<(HookOutput, List<Uri>), Failure>> _runHookForPackageCached(
     Hook hook,
     HookInput input,
     _HookValidator validator,
     Uri? resources,
     Uri buildDirUri,
     Uri outputDirectory,
-  ) async => await runUnderDirectoriesLock(
+  ) async =>
+      await runUnderDirectoriesLock(
     _fileSystem,
     [
       _fileSystem.directory(input.outputDirectoryShared).parent.uri,
@@ -350,15 +387,15 @@ class NativeAssetsBuildRunner {
     timeout: singleHookTimeout,
     logger: logger,
     () async {
-      final hookCompileResult = await _compileHookForPackageCached(
+      final hookCompileResultEither = await _compileHookForPackageCached(
         input.packageName,
         buildDirUri,
         input.packageRoot.resolve('hook/${hook.scriptName}'),
       );
-      if (hookCompileResult == null) {
-        return null;
+      if (hookCompileResultEither.isRight) {
+        return Right(hookCompileResultEither.rightOrNull!);
       }
-      final (hookKernelFile, hookHashes) = hookCompileResult;
+      final (hookKernelFile, hookHashes) = hookCompileResultEither.leftOrNull!;
 
       final buildOutputFile = _fileSystem.file(input.outputFile);
 
@@ -382,7 +419,10 @@ ${input.outputFile.toFilePath()} contained a format error.
 Contents: ${buildOutputFile.readAsStringSync()}.
 ${e.message}
         ''');
-          return null;
+          return Right(Failure(
+              type: FailureType.FileOperationFailed,
+              message: 'Failed to read hook output: format error',
+              exception: e));
         }
 
         final outdatedDependency = await dependenciesHashes
@@ -395,7 +435,7 @@ ${e.message}
           );
           // All build flags go into [outDir]. Therefore we do not have to
           // check here whether the input is equal.
-          return (output, hookHashes.fileSystemEntities);
+          return Left((output, hookHashes.fileSystemEntities));
         }
         logger.info(
           'Rerunning ${hook.name} for ${input.packageName}'
@@ -403,7 +443,7 @@ ${e.message}
         );
       }
 
-      final result = await _runHookForPackage(
+      final resultEither = await _runHookForPackage(
         hook,
         input,
         validator,
@@ -413,27 +453,30 @@ ${e.message}
         buildDirUri,
         outputDirectory,
       );
-      if (result == null) {
+      if (resultEither.isRight) {
         if (await dependenciesHashes.exists()) {
           await dependenciesHashes.delete();
         }
-        return null;
-      } else {
-        final modifiedDuringBuild = await dependenciesHashes.hashDependencies(
-          [
-            ...result.dependencies,
-            // Also depend on the compiled hook. Don't depend on the sources,
-            // if only whitespace changes, we don't need to rerun the hook.
-            hookKernelFile.uri,
-          ],
-          lastModifiedCutoffTime,
-          hookEnvironment,
-        );
-        if (modifiedDuringBuild != null) {
-          logger.severe('File modified during build. Build must be rerun.');
-        }
+        return Right(resultEither.rightOrNull!);
       }
-      return (result, hookHashes.fileSystemEntities);
+      final result = resultEither.leftOrNull!;
+      final modifiedDuringBuild = await dependenciesHashes.hashDependencies(
+        [
+          ...result.dependencies,
+          // Also depend on the compiled hook. Don't depend on the sources,
+          // if only whitespace changes, we don't need to rerun the hook.
+          hookKernelFile.uri,
+        ],
+        lastModifiedCutoffTime,
+        hookEnvironment,
+      );
+      if (modifiedDuringBuild != null) {
+        logger.severe('File modified during build. Build must be rerun.');
+        return Right(Failure(
+            type: FailureType.BuildFailed,
+            message: 'File modified during build. Build must be rerun.'));
+      }
+      return Left((result, hookHashes.fileSystemEntities));
     },
   );
 
@@ -455,7 +498,7 @@ ${e.message}
     'WINDIR', // Needed for CMake.
   };
 
-  Future<HookOutput?> _runHookForPackage(
+  Future<Either<HookOutput, Failure>> _runHookForPackage(
     Hook hook,
     HookInput input,
     _HookValidator validator,
@@ -518,20 +561,26 @@ ${e.message}
   ${result.stdout}
           ''');
         deleteOutputIfExists = true;
-        return null;
+        return Right(Failure(
+            type: FailureType.ProcessExecutionFailed,
+            message:
+                'Hook execution failed with exit code ${result.exitCode}',
+            exception: result.stderr));
       }
 
       final output = _readHookOutputFromUri(hook, hookOutputFile);
       final errors = await _validate(input, output, validator);
       if (errors.isNotEmpty) {
-        _printErrors(
+        // _printErrors logs.
+        final failure = _printErrors(
           '$hook hook of package:${input.packageName} has invalid output',
           errors,
+          FailureType.OutputValidationFailed,
         );
         deleteOutputIfExists = true;
-        return null;
+        return Right(failure);
       }
-      return output;
+      return Left(output);
     } on FormatException catch (e) {
       logger.severe('''
 Building assets for package:${input.packageName} failed.
@@ -540,7 +589,10 @@ ${input.outputFile.toFilePath()} contained a format error.
 Contents: ${hookOutputFile.readAsStringSync()}.
 ${e.message}
         ''');
-      return null;
+      return Right(Failure(
+          type: FailureType.FileOperationFailed,
+          message: 'Failed to read hook output: format error',
+          exception: e));
     } finally {
       if (deleteOutputIfExists) {
         if (await hookOutputFile.exists()) {
@@ -594,8 +646,8 @@ ${e.message}
   ///
   /// TODO(https://github.com/dart-lang/native/issues/1578): Compile only once
   /// instead of per input. This requires more locking.
-  Future<(File kernelFile, DependenciesHashFile cacheFile)?>
-  _compileHookForPackageCached(
+  Future<Either<(File kernelFile, DependenciesHashFile cacheFile), Failure>>
+      _compileHookForPackageCached(
     String packageName,
     Uri buildDirUri,
     Uri scriptUri,
@@ -631,18 +683,19 @@ ${e.message}
     }
 
     if (!mustCompile) {
-      return (kernelFile, dependenciesHashes);
+      return Left((kernelFile, dependenciesHashes));
     }
 
-    final success = await _compileHookForPackage(
+    final compileResultEither = await _compileHookForPackage(
       packageName,
       scriptUri,
       kernelFile,
       depFile,
     );
-    if (!success) {
-      return null;
+    if (compileResultEither.isRight) {
+      return Right(compileResultEither.rightOrNull!);
     }
+    // final success = compileResultEither.leftOrNull!; // success is true
 
     final dartSources = await _readDepFile(depFile);
 
@@ -658,9 +711,12 @@ ${e.message}
     );
     if (modifiedDuringBuild != null) {
       logger.severe('File modified during build. Build must be rerun.');
+      return Right(Failure(
+          type: FailureType.CompilationFailed,
+          message: 'File modified during build. Compilation must be rerun.'));
     }
 
-    return (kernelFile, dependenciesHashes);
+    return Left((kernelFile, dependenciesHashes));
   }
 
   Future<void> _makeHashablePackageConfig(Uri uri) async {
@@ -674,7 +730,7 @@ ${e.message}
     await _fileSystem.file(uri).writeAsString(contentsSanitized);
   }
 
-  Future<bool> _compileHookForPackage(
+  Future<Either<bool, Failure>> _compileHookForPackage(
     String packageName,
     Uri scriptUri,
     File kernelFile,
@@ -717,15 +773,20 @@ ${compileResult.stderr}
 stdout:
 ${compileResult.stdout}
         ''');
-      success = false;
+      // success = false;
       if (await depFile.exists()) {
         await depFile.delete();
       }
       if (await kernelFile.exists()) {
         await kernelFile.delete();
       }
+      return Right(Failure(
+          type: FailureType.CompilationFailed,
+          message:
+              'Hook compilation failed with exit code ${compileResult.exitCode}',
+          exception: compileResult.stderr));
     }
-    return success;
+    return Left(true);
   }
 
   /// Returns only the assets output as assetForBuild by the packages that are
@@ -794,29 +855,30 @@ ${compileResult.stdout}
     return planner;
   }();
 
-  Future<(List<Package>? plan, PackageGraph? dependencyGraph)> _makePlan({
+  Future<Either<(List<Package>? plan, PackageGraph? dependencyGraph), Failure>>
+      _makePlan({
     required Hook hook,
     // TODO(dacoharkes): How to share these two? Make them extend each other?
     BuildResult? buildResult,
   }) async {
-    final List<Package> buildPlan;
+    final List<Package>? buildPlan;
     final PackageGraph? packageGraph;
     switch (hook) {
       case Hook.build:
         final planner = await _planner;
         final plan = await planner.makeBuildHookPlan();
-        return (plan, planner.packageGraph);
+        return Left((plan, planner.packageGraph));
       case Hook.link:
         // Link hooks are not run in any particular order.
         // Link hooks are skipped if no assets for linking are provided.
-        buildPlan = [];
+        final List<Package> currentBuildPlan = [];
         final skipped = <String>[];
         final encodedAssetsForLinking = buildResult!.encodedAssetsForLinking;
         final planner = await _planner;
         final packagesWithHook = await planner.packagesWithHook(Hook.link);
         for (final package in packagesWithHook) {
           if (encodedAssetsForLinking[package.name]?.isNotEmpty ?? false) {
-            buildPlan.add(package);
+            currentBuildPlan.add(package);
           } else {
             skipped.add(package.name);
           }
@@ -827,9 +889,10 @@ ${compileResult.stdout}
             ' due to no assets provided to link for these link hooks.',
           );
         }
+        buildPlan = currentBuildPlan;
         packageGraph = null;
+        return Left((buildPlan, packageGraph));
     }
-    return (buildPlan, packageGraph);
   }
 
   HookOutput _readHookOutputFromUri(Hook hook, File hookOutputFile) {

@@ -1,0 +1,11 @@
+name: output_validation_fail_link
+description: A package with a link hook that produces invalid output.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  hooks:
+    path: ../../../hooks

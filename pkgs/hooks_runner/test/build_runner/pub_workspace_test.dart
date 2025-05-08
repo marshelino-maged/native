@@ -6,6 +6,9 @@ import 'dart:io';
 
 import 'package:file/local.dart';
 import 'package:hooks_runner/hooks_runner.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -83,7 +86,18 @@ dependency_overrides:
       'cyclic_package_2',
     ]);
 
-    (await buildCodeAssets(packageUri, runPackageName: 'native_add'))!;
+    final buildResult1Either =
+        await buildCodeAssets(packageUri, runPackageName: 'native_add');
+    expect(buildResult1Either.isLeft, true,
+        reason:
+            "Expected build to succeed, but got Failure: ${buildResult1Either.rightOrNull?.message}");
+    final buildResult1 = buildResult1Either.leftOrNull!;
+    expect(await buildResult1.encodedAssets.allExist(), true);
+    for (final encodedAssetsForLinking
+        in buildResult1.encodedAssetsForLinking.values) {
+      expect(await encodedAssetsForLinking.allExist(), true);
+    }
+
     final buildDirectory = tempUri.resolve('.dart_tool/hooks_runner/');
     final buildDirs =
         Directory.fromUri(buildDirectory)
@@ -97,7 +111,18 @@ dependency_overrides:
     expect(buildDirs, isNot(contains('native_subtract')));
 
     final logs = <String>[];
-    (await buildCodeAssets(tempUri.resolve('dart_app/'), capturedLogs: logs))!;
+    final buildResult2Either = await buildCodeAssets(
+        tempUri.resolve('dart_app/'),
+        capturedLogs: logs);
+    expect(buildResult2Either.isLeft, true,
+        reason:
+            "Expected build to succeed, but got Failure: ${buildResult2Either.rightOrNull?.message}");
+    final buildResult2 = buildResult2Either.leftOrNull!;
+    expect(await buildResult2.encodedAssets.allExist(), true);
+    for (final encodedAssetsForLinking
+        in buildResult2.encodedAssetsForLinking.values) {
+      expect(await encodedAssetsForLinking.allExist(), true);
+    }
     // Reuse hook results of other packages in the same workspace
     expect(logs.join('\n'), contains('Skipping build for native_add'));
   });

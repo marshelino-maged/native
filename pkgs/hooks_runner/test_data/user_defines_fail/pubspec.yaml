@@ -1,0 +1,17 @@
+name: user_defines_fail
+description: A package with invalid user_defines.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  hooks:
+    path: ../../../hooks
+
+hooks:
+  # This should be a map, not a list.
+  user_defines:
+    - invalid_key:
+        - "some_value"

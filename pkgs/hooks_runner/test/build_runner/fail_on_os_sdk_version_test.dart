@@ -3,6 +3,10 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:code_assets/code_assets.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
+import 'package:hooks_runner/src/model/link_result.dart';
 import 'package:hooks_runner/src/model/target.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -65,7 +69,7 @@ void main() async {
 
               {
                 final logMessages = <String>[];
-                final (buildResult, linkResult) = await buildAndLink(
+                final resultEither = await buildAndLink(
                   target: target,
                   targetIOSSdk: (target.os == OS.iOS) ? IOSSdk.iPhoneOS : null,
                   targetIOSVersion: (target.os == OS.iOS) ? version : null,
@@ -78,20 +82,35 @@ void main() async {
                   buildAssetTypes: [BuildAssetType.code, BuildAssetType.data],
                 );
                 final fullLog = logMessages.join('\n');
-                if (hook == 'build') {
-                  expect(buildResult, success ? isNotNull : isNull);
+
+                if (success) {
+                  expect(resultEither.isLeft, true,
+                      reason:
+                          "Expected buildAndLink to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+                  final (buildResult, linkResult) = resultEither.leftOrNull!;
+                  expect(await buildResult.encodedAssets.allExist(), true);
+                  for (final encodedAssetsForLinking
+                      in buildResult.encodedAssetsForLinking.values) {
+                    expect(await encodedAssetsForLinking.allExist(), true);
+                  }
+                  expect(await linkResult.encodedAssets.allExist(), true);
                 } else {
-                  assert(hook == 'link');
-                  expect(buildResult, isNotNull);
-                  expect(linkResult, success ? isNotNull : isNull);
-                }
-                if (!success) {
+                  expect(resultEither.isRight, true,
+                      reason: "Expected buildAndLink to fail, but it succeeded.");
+                  final failure = resultEither.rightOrNull!;
+                  // Depending on whether the failure occurs in build or link,
+                  // the exact FailureType might vary.
+                  // For this test, the message is more important.
                   expect(
                     fullLog,
                     contains(
                       'The native assets for this package require at least',
                     ),
                   );
+                  expect(
+                      failure.message,
+                      contains(
+                          'The native assets for this package require at least'));
                 }
               }
             });

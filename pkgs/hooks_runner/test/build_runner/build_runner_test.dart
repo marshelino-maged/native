@@ -5,6 +5,9 @@
 import 'dart:io';
 
 import 'package:file_testing/file_testing.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -24,14 +27,18 @@ void main() async {
       // Trigger a build, should invoke build for libraries with native assets.
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final buildResultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+
+        expect(buildResultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got ${buildResultEither.rightOrNull?.message}");
+        final buildResult = buildResultEither.leftOrNull!;
         expect(
           logMessages.join('\n'),
           stringContainsInOrder([
@@ -39,7 +46,12 @@ void main() async {
                 '${Platform.pathSeparator}build.dart',
           ]),
         );
-        expect(result.encodedAssets.length, 1);
+        expect(buildResult.encodedAssets.length, 1);
+        expect(await buildResult.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in buildResult.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
 
         // Check that invocation logs are written to disk.
         final packgeBuildDirectory = Directory.fromUri(
@@ -68,14 +80,17 @@ void main() async {
 
       // Trigger a build, should not invoke anything.
       final logMessages = <String>[];
-      final result =
-          (await build(
-            packageUri,
-            logger,
-            dartExecutable,
-            capturedLogs: logMessages,
-            buildAssetTypes: [BuildAssetType.code],
-          ))!;
+      final buildResultEither = await build(
+        packageUri,
+        logger,
+        dartExecutable,
+        capturedLogs: logMessages,
+        buildAssetTypes: [BuildAssetType.code],
+      );
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
       expect(
         false,
         logMessages
@@ -85,7 +100,12 @@ void main() async {
               '${Platform.pathSeparator}build.dart',
             ),
       );
-      expect(result.encodedAssets.length, 1);
+      expect(buildResult.encodedAssets.length, 1);
+      expect(await buildResult.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in buildResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
     });
   });
 }

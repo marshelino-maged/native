@@ -7,6 +7,10 @@ import 'dart:io';
 import 'package:code_assets/code_assets.dart';
 import 'package:data_assets/data_assets.dart';
 import 'package:hooks/hooks.dart' hide build, link;
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
+import 'package:hooks_runner/src/model/link_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -23,23 +27,47 @@ void main() async {
       // First, run `pub get`, we need pub to resolve our dependencies.
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
-      final buildResult =
-          (await buildDataAssets(packageUri, linkingEnabled: true))!;
+      final buildResultEither =
+          await buildDataAssets(packageUri, linkingEnabled: true);
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
       expect(buildResult.encodedAssets.length, 0);
+      // No assets, so no allExist check needed here for buildResult.encodedAssets
+      // but check encodedAssetsForLinking
+      for (final encodedAssetsForLinking
+          in buildResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
 
-      final linkResult =
-          (await link(
-            packageUri,
-            logger,
-            dartExecutable,
-            buildResult: buildResult,
-            buildAssetTypes: [BuildAssetType.data],
-          ))!;
+
+      final linkResultEither = await link(
+        packageUri,
+        logger,
+        dartExecutable,
+        buildResult: buildResult,
+        buildAssetTypes: [BuildAssetType.data],
+      );
+      expect(linkResultEither.isLeft, true,
+          reason:
+              "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+      final linkResult = linkResultEither.leftOrNull!;
       expect(linkResult.encodedAssets.length, 2);
+      expect(await linkResult.encodedAssets.allExist(), true);
 
-      final buildNoLinkResult =
-          (await buildDataAssets(packageUri, linkingEnabled: false))!;
+      final buildNoLinkResultEither =
+          await buildDataAssets(packageUri, linkingEnabled: false);
+      expect(buildNoLinkResultEither.isLeft, true,
+          reason:
+              "Expected build (no link) to succeed, but got Failure: ${buildNoLinkResultEither.rightOrNull?.message}");
+      final buildNoLinkResult = buildNoLinkResultEither.leftOrNull!;
       expect(buildNoLinkResult.encodedAssets.length, 4);
+      expect(await buildNoLinkResult.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in buildNoLinkResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
     });
   });
 
@@ -68,13 +96,21 @@ void main() async {
       // First, run `pub get`, we need pub to resolve our dependencies.
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
-      final buildResult = await buildDataAssets(
+      final buildResultEither = await buildDataAssets(
         packageUri,
         linkingEnabled: true,
       );
-      expect(buildResult, isNotNull);
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
+      expect(await buildResult.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in buildResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
       expect(
-        _getNames(buildResult!.encodedAssets),
+        _getNames(buildResult.encodedAssets),
         unorderedEquals(builtHelperAssets),
       );
       expect(
@@ -82,21 +118,25 @@ void main() async {
         unorderedEquals(encodedAssetsForLinking),
       );
 
-      final linkResult = await link(
+      final linkResultEither = await link(
         packageUri,
         logger,
         dartExecutable,
         buildResult: buildResult,
         buildAssetTypes: [BuildAssetType.data],
       );
-      expect(linkResult, isNotNull);
+      expect(linkResultEither.isLeft, true,
+          reason:
+              "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+      final linkResult = linkResultEither.leftOrNull!;
+      expect(await linkResult.encodedAssets.allExist(), true);
 
       expect(
         _getNames(buildResult.encodedAssets),
         unorderedEquals(builtHelperAssets),
       );
       expect(
-        _getNames(linkResult!.encodedAssets),
+        _getNames(linkResult.encodedAssets),
         unorderedEquals(linkedAssets),
       );
     });
@@ -110,22 +150,31 @@ void main() async {
       // First, run `pub get`, we need pub to resolve our dependencies.
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
-      final buildResult =
-          (await buildDataAssets(packageUri, linkingEnabled: true))!;
+      final buildResultEither =
+          await buildDataAssets(packageUri, linkingEnabled: true);
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
       expect(buildResult.encodedAssets.length, 0);
+      // No assets, so no allExist check needed here for buildResult.encodedAssets
       expect(buildResult.encodedAssetsForLinking.length, 0);
 
       final logMessages = <String>[];
-      final linkResult =
-          (await link(
-            packageUri,
-            logger,
-            dartExecutable,
-            buildResult: buildResult,
-            capturedLogs: logMessages,
-            buildAssetTypes: [BuildAssetType.data],
-          ))!;
+      final linkResultEither = await link(
+        packageUri,
+        logger,
+        dartExecutable,
+        buildResult: buildResult,
+        capturedLogs: logMessages,
+        buildAssetTypes: [BuildAssetType.data],
+      );
+      expect(linkResultEither.isLeft, true,
+          reason:
+              "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+      final linkResult = linkResultEither.leftOrNull!;
       expect(linkResult.encodedAssets.length, 0);
+      // No assets, so no allExist check needed here for linkResult.encodedAssets
       expect(
         logMessages,
         contains(
@@ -149,28 +198,40 @@ void main() async {
       // First, run `pub get`, we need pub to resolve our dependencies.
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
-      final buildResult =
-          (await build(
-            packageUri,
-            logger,
-            dartExecutable,
-            linkingEnabled: true,
-            buildAssetTypes: [BuildAssetType.code],
-          ))!;
+      final buildResultEither = await build(
+        packageUri,
+        logger,
+        dartExecutable,
+        linkingEnabled: true,
+        buildAssetTypes: [BuildAssetType.code],
+      );
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
       expect(buildResult.encodedAssets.length, 0);
+      // No assets, so no allExist check needed here for buildResult.encodedAssets
       expect(buildResult.encodedAssetsForLinking.length, 1);
+      for (final encodedAssetsForLinking
+          in buildResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
 
       final logMessages = <String>[];
-      final linkResult =
-          (await link(
-            packageUri,
-            logger,
-            dartExecutable,
-            buildResult: buildResult,
-            capturedLogs: logMessages,
-            buildAssetTypes: [BuildAssetType.code],
-          ))!;
+      final linkResultEither = await link(
+        packageUri,
+        logger,
+        dartExecutable,
+        buildResult: buildResult,
+        capturedLogs: logMessages,
+        buildAssetTypes: [BuildAssetType.code],
+      );
+      expect(linkResultEither.isLeft, true,
+          reason:
+              "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+      final linkResult = linkResultEither.leftOrNull!;
       expect(linkResult.encodedAssets.length, 1);
+      expect(await linkResult.encodedAssets.allExist(), true);
       expect(linkResult.encodedAssets.first.isCodeAsset, isTrue);
     });
   });

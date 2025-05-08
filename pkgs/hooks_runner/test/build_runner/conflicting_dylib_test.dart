@@ -2,6 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
+import 'package:hooks_runner/src/model/link_result.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
@@ -20,15 +24,20 @@ void main() async {
 
       {
         final logMessages = <String>[];
-        final result = await build(
+        final resultEither = await build(
           packageUri,
           createCapturingLogger(logMessages, level: Level.SEVERE),
           dartExecutable,
           buildAssetTypes: [BuildAssetType.code],
         );
         final fullLog = logMessages.join('\n');
-        expect(result, isNull);
+        expect(resultEither.isRight, true,
+            reason: "Expected build to fail, but it succeeded.");
+        final failure = resultEither.rightOrNull!;
+        expect(failure.type, FailureType.OutputValidationFailed);
         expect(fullLog, contains('Duplicate dynamic library file name'));
+        expect(failure.message,
+            contains('Build hook of package:native_add_duplicate has invalid output'));
       }
     });
   });
@@ -43,16 +52,25 @@ void main() async {
 
         await runPubGet(workingDirectory: packageUri, logger: logger);
 
-        final buildResult =
-            (await build(
-              packageUri,
-              logger,
-              linkingEnabled: true,
-              dartExecutable,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final buildResultEither = await build(
+          packageUri,
+          logger,
+          linkingEnabled: true,
+          dartExecutable,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(buildResultEither.isLeft, true,
+            reason:
+                "Expected initial build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+        final buildResult = buildResultEither.leftOrNull!;
+        expect(await buildResult.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in buildResult.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
 
-        final linkResult = await link(
+
+        final linkResultEither = await link(
           packageUri,
           logger,
           dartExecutable,
@@ -60,7 +78,11 @@ void main() async {
           buildAssetTypes: [BuildAssetType.code],
         );
         // Application validation error due to conflicting dylib name.
-        expect(linkResult, isNull);
+        expect(linkResultEither.isRight, true,
+            reason: "Expected link to fail, but it succeeded.");
+        final linkFailure = linkResultEither.rightOrNull!;
+        expect(linkFailure.type, FailureType.OutputValidationFailed);
+        expect(linkFailure.message, contains('Application asset verification failed'));
       });
     },
   );

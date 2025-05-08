@@ -5,6 +5,9 @@
 import 'package:code_assets/code_assets.dart';
 import 'package:file/local.dart';
 import 'package:hooks_runner/src/build_runner/build_runner.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:hooks_runner/src/package_layout/package_layout.dart';
 import 'package:test/test.dart';
 
@@ -47,8 +50,29 @@ void main() async {
         linkModePreference: LinkModePreference.dynamic,
       );
 
-      await buildRunner.build(extensions: [extension], linkingEnabled: false);
-      await buildRunner.build(extensions: [extension], linkingEnabled: false);
+      final result1Either = await buildRunner.build(
+          extensions: [extension], linkingEnabled: false);
+      expect(result1Either.isLeft, true,
+          reason:
+              "Expected first build to succeed, but got Failure: ${result1Either.rightOrNull?.message}");
+      final result1 = result1Either.leftOrNull!;
+      expect(await result1.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in result1.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
+
+      final result2Either = await buildRunner.build(
+          extensions: [extension], linkingEnabled: false);
+      expect(result2Either.isLeft, true,
+          reason:
+              "Expected second build to succeed, but got Failure: ${result2Either.rightOrNull?.message}");
+      final result2 = result2Either.leftOrNull!;
+      expect(await result2.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in result2.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
     });
   });
 }

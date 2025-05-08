@@ -4,6 +4,9 @@
 
 import 'dart:io';
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -23,14 +26,17 @@ void main() async {
       // Trigger a build, should invoke build for libraries with native assets.
       {
         final logMessages = <String>[];
-        final result =
-            (await build(
-              packageUri,
-              logger,
-              dartExecutable,
-              capturedLogs: logMessages,
-              buildAssetTypes: [BuildAssetType.code],
-            ))!;
+        final resultEither = await build(
+          packageUri,
+          logger,
+          dartExecutable,
+          capturedLogs: logMessages,
+          buildAssetTypes: [BuildAssetType.code],
+        );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        final result = resultEither.leftOrNull!;
         expect(
           logMessages.join('\n'),
           stringContainsInOrder([
@@ -41,6 +47,11 @@ void main() async {
           ]),
         );
         expect(result.encodedAssets.length, 2);
+        expect(await result.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in result.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
         expect(
           result.dependencies,
           containsAll([

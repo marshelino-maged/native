@@ -4,6 +4,10 @@
 
 import 'dart:io';
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
+import 'package:hooks_runner/src/model/link_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -23,8 +27,21 @@ void main() async {
       // First, run `pub get`, we need pub to resolve our dependencies.
       await runPubGet(workingDirectory: packageUri, logger: logger);
 
-      final buildResult =
-          (await buildDataAssets(packageUri, linkingEnabled: true))!;
+      final buildResultEither =
+          await buildDataAssets(packageUri, linkingEnabled: true);
+      expect(buildResultEither.isLeft, true,
+          reason:
+              "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+      final buildResult = buildResultEither.leftOrNull!;
+      // Since linkingEnabled is true, buildResult itself might not have many direct assets,
+      // but encodedAssetsForLinking should exist if the hook produced them.
+      // However, simple_link's build hook doesn't output assets when linkingEnabled.
+      // So, checking allExist on buildResult.encodedAssets is fine.
+      expect(await buildResult.encodedAssets.allExist(), true);
+      for (final encodedAssetsForLinking
+          in buildResult.encodedAssetsForLinking.values) {
+        expect(await encodedAssetsForLinking.allExist(), true);
+      }
 
       Iterable<String> buildFiles() => Directory.fromUri(
         packageUri.resolve('.dart_tool/hooks_runner/'),
@@ -32,7 +49,7 @@ void main() async {
 
       expect(buildFiles(), isNot(anyElement(endsWith('resources.json'))));
 
-      await link(
+      final linkResultEither = await link(
         packageUri,
         logger,
         dartExecutable,
@@ -40,6 +57,12 @@ void main() async {
         resourceIdentifiers: resourcesUri,
         buildAssetTypes: [BuildAssetType.data],
       );
+      expect(linkResultEither.isLeft, true,
+          reason:
+              "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+      final linkResult = linkResultEither.leftOrNull!;
+      expect(await linkResult.encodedAssets.allExist(), true);
+
       expect(buildFiles(), anyElement(endsWith('resources.json')));
     });
   });

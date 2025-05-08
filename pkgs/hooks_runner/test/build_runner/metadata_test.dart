@@ -4,6 +4,9 @@
 
 import 'dart:io';
 
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
+import 'package:hooks_runner/src/model/build_result.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -23,13 +26,19 @@ void main() async {
       // Trigger a build, should invoke build for libraries with native assets.
       {
         final logMessages = <String>[];
-        await build(
+        final resultEither = await build(
           packageUri,
           logger,
           dartExecutable,
           capturedLogs: logMessages,
-          buildAssetTypes: [],
+          buildAssetTypes: [], // No assets expected to be built/linked.
         );
+        expect(resultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${resultEither.rightOrNull?.message}");
+        // Since buildAssetTypes is empty, we don't expect any assets.
+        // No allExist checks needed.
+
         expect(
           logMessages.join('\n'),
           stringContainsInOrder([

@@ -5,6 +5,8 @@
 import 'dart:io';
 
 import 'package:hooks_runner/hooks_runner.dart';
+import 'package:hooks_runner/src/either.dart';
+import 'package:hooks_runner/src/failure.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -26,29 +28,41 @@ void main() async {
       late LinkResult linkResult;
       Future<void> runBuild() async {
         logMessages.clear();
-        buildResult =
-            (await buildDataAssets(
-              packageUri,
-              linkingEnabled: true,
-              capturedLogs: logMessages,
-            ))!;
+        final buildResultEither = await buildDataAssets(
+          packageUri,
+          linkingEnabled: true,
+          capturedLogs: logMessages,
+        );
+        expect(buildResultEither.isLeft, true,
+            reason:
+                "Expected build to succeed, but got Failure: ${buildResultEither.rightOrNull?.message}");
+        buildResult = buildResultEither.leftOrNull!;
+        expect(await buildResult.encodedAssets.allExist(), true);
+        for (final encodedAssetsForLinking
+            in buildResult.encodedAssetsForLinking.values) {
+          expect(await encodedAssetsForLinking.allExist(), true);
+        }
       }
 
       Future<void> runLink() async {
         logMessages.clear();
-        linkResult =
-            (await link(
-              packageUri,
-              logger,
-              dartExecutable,
-              buildResult: buildResult,
-              buildAssetTypes: [BuildAssetType.data],
-              capturedLogs: logMessages,
-            ))!;
+        final linkResultEither = await link(
+          packageUri,
+          logger,
+          dartExecutable,
+          buildResult: buildResult,
+          buildAssetTypes: [BuildAssetType.data],
+          capturedLogs: logMessages,
+        );
+        expect(linkResultEither.isLeft, true,
+            reason:
+                "Expected link to succeed, but got Failure: ${linkResultEither.rightOrNull?.message}");
+        linkResult = linkResultEither.leftOrNull!;
+        expect(await linkResult.encodedAssets.allExist(), true);
       }
 
       await runBuild();
-      expect(buildResult, isNotNull);
+      // expect(buildResult, isNotNull); // Already checked in runBuild
       expect(
         logMessages.join('\n'),
         stringContainsInOrder([
@@ -62,7 +76,7 @@ void main() async {
       );
 
       await runLink();
-      expect(linkResult, isNotNull);
+      // expect(linkResult, isNotNull); // Already checked in runLink
       expect(
         logMessages.join('\n'),
         stringContainsInOrder([
@@ -76,14 +90,14 @@ void main() async {
       );
 
       await runBuild();
-      expect(buildResult, isNotNull);
+      // expect(buildResult, isNotNull); // Already checked in runBuild
       expect(
         logMessages.join('\n'),
         contains('Skipping build for $packageName'),
       );
 
       await runLink();
-      expect(linkResult, isNotNull);
+      // expect(linkResult, isNotNull); // Already checked in runLink
       expect(
         logMessages.join('\n'),
         contains('Skipping link for $packageName'),
@@ -95,28 +109,28 @@ void main() async {
       );
 
       await runBuild();
-      expect(buildResult, isNotNull);
+      // expect(buildResult, isNotNull); // Already checked in runBuild
       expect(
         logMessages.join('\n'),
         stringContainsInOrder(['Running', 'hook.dill']),
       );
 
       await runLink();
-      expect(linkResult, isNotNull);
+      // expect(linkResult, isNotNull); // Already checked in runLink
       expect(
         logMessages.join('\n'),
         stringContainsInOrder(['Running', 'hook.dill']),
       );
 
       await runBuild();
-      expect(buildResult, isNotNull);
+      // expect(buildResult, isNotNull); // Already checked in runBuild
       expect(
         logMessages.join('\n'),
         contains('Skipping build for $packageName'),
       );
 
       await runLink();
-      expect(linkResult, isNotNull);
+      // expect(linkResult, isNotNull); // Already checked in runLink
       expect(
         logMessages.join('\n'),
         contains('Skipping link for $packageName'),

@@ -1,0 +1,18 @@
+android_sdk_config:
+  add_gradle_deps: true
+
+summarizer:
+  backend: asm
+
+suspend_fun_to_async: true
+
+output:
+  dart:
+    path: lib/camerax.dart
+    structure: single_file
+
+classes:
+  - java.io.File
+  - androidx.camera.core.ImageCapture
+  - androidx.camera.core.ImageCaptureException
+  - java.util.concurrent.Executor

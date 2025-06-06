@@ -14,7 +14,8 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:objective_c/objective_c.dart';
-import 'package:objective_c/src/objective_c_bindings_generated.dart';
+import 'package:objective_c/src/objective_c_bindings_generated.dart'
+    show DartInputStreamAdapter;
 import 'package:test/test.dart';
 
 import 'util.dart';
@@ -40,7 +41,7 @@ void main() {
   group('NSInputStream', () {
     setUpAll(() {
       // TODO(https://github.com/dart-lang/native/issues/1068): Remove this.
-      DynamicLibrary.open('test/objective_c.dylib');
+      DynamicLibrary.open(testDylib);
     });
 
     group('toNSInputStream', () {

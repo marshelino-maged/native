@@ -1,7 +1,8 @@
 import 'dart:io';
 
 Future<String> analyzeAndFix(String code, String bindingsPath) async {
-  code = '''import 'package:jni/jni.dart';
+  code = '''
+import 'package:jni/jni.dart';
 import '$bindingsPath';
 
 $code''';
@@ -11,7 +12,7 @@ $code''';
   final file = File('${directory.path}/snippet.dart');
   await file.writeAsString(code);
 
-  print('Code written to: ${file.path}');
+  print('Code written to: ${file.path}\n');
 
   final fix = await Process.run('dart', [
     'fix',

@@ -28,8 +28,16 @@ class Class {
       setters = [];
 
   @override
-  String toString() =>
-      '''- ${isInterface ? 'interface ' : ''}${isAbstract ? 'abstract ' : ''}class $name ${extendedClass.isNotEmpty ? 'extends $extendedClass ' : ''}${implementedInterfaces.isNotEmpty ? 'implements ${implementedInterfaces.join(', ')} ' : ''}''';
+  String toString() => '''
+${isInterface ? 'interface ' : ''}${isAbstract ? 'abstract ' : ''}class $name ${extendedClass.isNotEmpty ? 'extends $extendedClass ' : ''}${implementedInterfaces.isNotEmpty ? 'implements ${implementedInterfaces.join(', ')} ' : ''}
+{
+${constructors.map((c) => '${c.toString()};').join('\n')}
+${fields.map((f) => '${f.toString()};').join('\n')}
+${methods.map((m) => '${m.toString()};').join('\n')}
+${getters.map((g) => '${g.toString()};').join('\n')}
+${setters.map((s) => '${s.toString()};').join('\n')}
+}
+''';
 
   void addField(Field field) {
     fields.add(field);
@@ -94,7 +102,8 @@ class Constructor {
   @override
   String toString() {
     final constructorName = name.isNotEmpty ? '$className.$name' : className;
-    return '${factoryKeyword ?? ''} $constructorName$parameters';
+    return '${factoryKeyword != null ? '$factoryKeyword ' : ''}'
+        '$constructorName$parameters';
   }
 }
 

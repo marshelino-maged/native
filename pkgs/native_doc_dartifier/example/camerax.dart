@@ -256,12 +256,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String getName()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getName() {
-    return _getName(
+  jni$_.JString? getName() => _getName(
       reference.pointer,
       _id_getName as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_getParent = _class.instanceMethodId(
     r'getParent',
@@ -286,12 +284,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String getParent()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getParent() {
-    return _getParent(
+  jni$_.JString? getParent() => _getParent(
       reference.pointer,
       _id_getParent as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_getParentFile = _class.instanceMethodId(
     r'getParentFile',
@@ -316,12 +312,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.io.File getParentFile()`
   /// The returned object must be released after use, by calling the [release] method.
-  File? getParentFile() {
-    return _getParentFile(
+  File? getParentFile() => _getParentFile(
       reference.pointer,
       _id_getParentFile as jni$_.JMethodIDPtr,
     ).object<File?>(const $File$NullableType());
-  }
 
   static final _id_getPath = _class.instanceMethodId(
     r'getPath',
@@ -346,12 +340,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String getPath()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getPath() {
-    return _getPath(
+  jni$_.JString? getPath() => _getPath(
       reference.pointer,
       _id_getPath as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_isAbsolute = _class.instanceMethodId(r'isAbsolute', r'()Z');
 
@@ -372,12 +364,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean isAbsolute()`
-  bool isAbsolute() {
-    return _isAbsolute(
+  bool isAbsolute() => _isAbsolute(
       reference.pointer,
       _id_isAbsolute as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_getAbsolutePath = _class.instanceMethodId(
     r'getAbsolutePath',
@@ -402,12 +392,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String getAbsolutePath()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getAbsolutePath() {
-    return _getAbsolutePath(
+  jni$_.JString? getAbsolutePath() => _getAbsolutePath(
       reference.pointer,
       _id_getAbsolutePath as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_getAbsoluteFile = _class.instanceMethodId(
     r'getAbsoluteFile',
@@ -432,12 +420,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.io.File getAbsoluteFile()`
   /// The returned object must be released after use, by calling the [release] method.
-  File? getAbsoluteFile() {
-    return _getAbsoluteFile(
+  File? getAbsoluteFile() => _getAbsoluteFile(
       reference.pointer,
       _id_getAbsoluteFile as jni$_.JMethodIDPtr,
     ).object<File?>(const $File$NullableType());
-  }
 
   static final _id_getCanonicalPath = _class.instanceMethodId(
     r'getCanonicalPath',
@@ -462,12 +448,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String getCanonicalPath()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getCanonicalPath() {
-    return _getCanonicalPath(
+  jni$_.JString? getCanonicalPath() => _getCanonicalPath(
       reference.pointer,
       _id_getCanonicalPath as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_getCanonicalFile = _class.instanceMethodId(
     r'getCanonicalFile',
@@ -492,12 +476,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.io.File getCanonicalFile()`
   /// The returned object must be released after use, by calling the [release] method.
-  File? getCanonicalFile() {
-    return _getCanonicalFile(
+  File? getCanonicalFile() => _getCanonicalFile(
       reference.pointer,
       _id_getCanonicalFile as jni$_.JMethodIDPtr,
     ).object<File?>(const $File$NullableType());
-  }
 
   static final _id_toURL = _class.instanceMethodId(
     r'toURL',
@@ -522,12 +504,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.net.URL toURL()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? toURL() {
-    return _toURL(
+  jni$_.JObject? toURL() => _toURL(
       reference.pointer,
       _id_toURL as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_toURI = _class.instanceMethodId(
     r'toURI',
@@ -552,12 +532,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.net.URI toURI()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? toURI() {
-    return _toURI(
+  jni$_.JObject? toURI() => _toURI(
       reference.pointer,
       _id_toURI as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_canRead = _class.instanceMethodId(r'canRead', r'()Z');
 
@@ -578,12 +556,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean canRead()`
-  bool canRead() {
-    return _canRead(
+  bool canRead() => _canRead(
       reference.pointer,
       _id_canRead as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_canWrite = _class.instanceMethodId(r'canWrite', r'()Z');
 
@@ -604,12 +580,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean canWrite()`
-  bool canWrite() {
-    return _canWrite(
+  bool canWrite() => _canWrite(
       reference.pointer,
       _id_canWrite as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_exists = _class.instanceMethodId(r'exists', r'()Z');
 
@@ -630,9 +604,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean exists()`
-  bool exists() {
-    return _exists(reference.pointer, _id_exists as jni$_.JMethodIDPtr).boolean;
-  }
+  bool exists() => _exists(reference.pointer, _id_exists as jni$_.JMethodIDPtr).boolean;
 
   static final _id_isDirectory = _class.instanceMethodId(
     r'isDirectory',
@@ -656,12 +628,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean isDirectory()`
-  bool isDirectory() {
-    return _isDirectory(
+  bool isDirectory() => _isDirectory(
       reference.pointer,
       _id_isDirectory as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_isFile = _class.instanceMethodId(r'isFile', r'()Z');
 
@@ -682,9 +652,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean isFile()`
-  bool isFile() {
-    return _isFile(reference.pointer, _id_isFile as jni$_.JMethodIDPtr).boolean;
-  }
+  bool isFile() => _isFile(reference.pointer, _id_isFile as jni$_.JMethodIDPtr).boolean;
 
   static final _id_isHidden = _class.instanceMethodId(r'isHidden', r'()Z');
 
@@ -705,12 +673,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean isHidden()`
-  bool isHidden() {
-    return _isHidden(
+  bool isHidden() => _isHidden(
       reference.pointer,
       _id_isHidden as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_lastModified = _class.instanceMethodId(
     r'lastModified',
@@ -734,12 +700,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public long lastModified()`
-  int lastModified() {
-    return _lastModified(
+  int lastModified() => _lastModified(
       reference.pointer,
       _id_lastModified as jni$_.JMethodIDPtr,
     ).long;
-  }
 
   static final _id_length = _class.instanceMethodId(r'length', r'()J');
 
@@ -760,9 +724,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public long length()`
-  int length() {
-    return _length(reference.pointer, _id_length as jni$_.JMethodIDPtr).long;
-  }
+  int length() => _length(reference.pointer, _id_length as jni$_.JMethodIDPtr).long;
 
   static final _id_createNewFile = _class.instanceMethodId(
     r'createNewFile',
@@ -786,12 +748,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean createNewFile()`
-  bool createNewFile() {
-    return _createNewFile(
+  bool createNewFile() => _createNewFile(
       reference.pointer,
       _id_createNewFile as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_delete = _class.instanceMethodId(r'delete', r'()Z');
 
@@ -812,9 +772,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean delete()`
-  bool delete() {
-    return _delete(reference.pointer, _id_delete as jni$_.JMethodIDPtr).boolean;
-  }
+  bool delete() => _delete(reference.pointer, _id_delete as jni$_.JMethodIDPtr).boolean;
 
   static final _id_deleteOnExit = _class.instanceMethodId(
     r'deleteOnExit',
@@ -868,8 +826,7 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String[] list()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JArray<jni$_.JString?>? list() {
-    return _list(
+  jni$_.JArray<jni$_.JString?>? list() => _list(
       reference.pointer,
       _id_list as jni$_.JMethodIDPtr,
     ).object<jni$_.JArray<jni$_.JString?>?>(
@@ -877,7 +834,6 @@ class File extends jni$_.JObject {
         jni$_.JStringNullableType(),
       ),
     );
-  }
 
   static final _id_list$1 = _class.instanceMethodId(
     r'list',
@@ -940,14 +896,12 @@ class File extends jni$_.JObject {
 
   /// from: `public java.io.File[] listFiles()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JArray<File?>? listFiles() {
-    return _listFiles(
+  jni$_.JArray<File?>? listFiles() => _listFiles(
       reference.pointer,
       _id_listFiles as jni$_.JMethodIDPtr,
     ).object<jni$_.JArray<File?>?>(
       const jni$_.JArrayNullableType<File?>($File$NullableType()),
     );
-  }
 
   static final _id_listFiles$1 = _class.instanceMethodId(
     r'listFiles',
@@ -1040,9 +994,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean mkdir()`
-  bool mkdir() {
-    return _mkdir(reference.pointer, _id_mkdir as jni$_.JMethodIDPtr).boolean;
-  }
+  bool mkdir() => _mkdir(reference.pointer, _id_mkdir as jni$_.JMethodIDPtr).boolean;
 
   static final _id_mkdirs = _class.instanceMethodId(r'mkdirs', r'()Z');
 
@@ -1063,9 +1015,7 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean mkdirs()`
-  bool mkdirs() {
-    return _mkdirs(reference.pointer, _id_mkdirs as jni$_.JMethodIDPtr).boolean;
-  }
+  bool mkdirs() => _mkdirs(reference.pointer, _id_mkdirs as jni$_.JMethodIDPtr).boolean;
 
   static final _id_renameTo = _class.instanceMethodId(
     r'renameTo',
@@ -1124,13 +1074,11 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setLastModified(long j)`
-  bool setLastModified(int j) {
-    return _setLastModified(
+  bool setLastModified(int j) => _setLastModified(
       reference.pointer,
       _id_setLastModified as jni$_.JMethodIDPtr,
       j,
     ).boolean;
-  }
 
   static final _id_setReadOnly = _class.instanceMethodId(
     r'setReadOnly',
@@ -1154,12 +1102,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setReadOnly()`
-  bool setReadOnly() {
-    return _setReadOnly(
+  bool setReadOnly() => _setReadOnly(
       reference.pointer,
       _id_setReadOnly as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_setWritable = _class.instanceMethodId(
     r'setWritable',
@@ -1186,14 +1132,12 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setWritable(boolean z, boolean z1)`
-  bool setWritable(bool z, bool z1) {
-    return _setWritable(
+  bool setWritable(bool z, bool z1) => _setWritable(
       reference.pointer,
       _id_setWritable as jni$_.JMethodIDPtr,
       z ? 1 : 0,
       z1 ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_setWritable$1 = _class.instanceMethodId(
     r'setWritable',
@@ -1219,13 +1163,11 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setWritable(boolean z)`
-  bool setWritable$1(bool z) {
-    return _setWritable$1(
+  bool setWritable$1(bool z) => _setWritable$1(
       reference.pointer,
       _id_setWritable$1 as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_setReadable = _class.instanceMethodId(
     r'setReadable',
@@ -1252,14 +1194,12 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setReadable(boolean z, boolean z1)`
-  bool setReadable(bool z, bool z1) {
-    return _setReadable(
+  bool setReadable(bool z, bool z1) => _setReadable(
       reference.pointer,
       _id_setReadable as jni$_.JMethodIDPtr,
       z ? 1 : 0,
       z1 ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_setReadable$1 = _class.instanceMethodId(
     r'setReadable',
@@ -1285,13 +1225,11 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setReadable(boolean z)`
-  bool setReadable$1(bool z) {
-    return _setReadable$1(
+  bool setReadable$1(bool z) => _setReadable$1(
       reference.pointer,
       _id_setReadable$1 as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_setExecutable = _class.instanceMethodId(
     r'setExecutable',
@@ -1318,14 +1256,12 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setExecutable(boolean z, boolean z1)`
-  bool setExecutable(bool z, bool z1) {
-    return _setExecutable(
+  bool setExecutable(bool z, bool z1) => _setExecutable(
       reference.pointer,
       _id_setExecutable as jni$_.JMethodIDPtr,
       z ? 1 : 0,
       z1 ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_setExecutable$1 = _class.instanceMethodId(
     r'setExecutable',
@@ -1351,13 +1287,11 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean setExecutable(boolean z)`
-  bool setExecutable$1(bool z) {
-    return _setExecutable$1(
+  bool setExecutable$1(bool z) => _setExecutable$1(
       reference.pointer,
       _id_setExecutable$1 as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).boolean;
-  }
 
   static final _id_canExecute = _class.instanceMethodId(r'canExecute', r'()Z');
 
@@ -1378,12 +1312,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public boolean canExecute()`
-  bool canExecute() {
-    return _canExecute(
+  bool canExecute() => _canExecute(
       reference.pointer,
       _id_canExecute as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_listRoots = _class.staticMethodId(
     r'listRoots',
@@ -1408,14 +1340,12 @@ class File extends jni$_.JObject {
 
   /// from: `static public java.io.File[] listRoots()`
   /// The returned object must be released after use, by calling the [release] method.
-  static jni$_.JArray<File?>? listRoots() {
-    return _listRoots(
+  static jni$_.JArray<File?>? listRoots() => _listRoots(
       _class.reference.pointer,
       _id_listRoots as jni$_.JMethodIDPtr,
     ).object<jni$_.JArray<File?>?>(
       const jni$_.JArrayNullableType<File?>($File$NullableType()),
     );
-  }
 
   static final _id_getTotalSpace = _class.instanceMethodId(
     r'getTotalSpace',
@@ -1439,12 +1369,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public long getTotalSpace()`
-  int getTotalSpace() {
-    return _getTotalSpace(
+  int getTotalSpace() => _getTotalSpace(
       reference.pointer,
       _id_getTotalSpace as jni$_.JMethodIDPtr,
     ).long;
-  }
 
   static final _id_getFreeSpace = _class.instanceMethodId(
     r'getFreeSpace',
@@ -1468,12 +1396,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public long getFreeSpace()`
-  int getFreeSpace() {
-    return _getFreeSpace(
+  int getFreeSpace() => _getFreeSpace(
       reference.pointer,
       _id_getFreeSpace as jni$_.JMethodIDPtr,
     ).long;
-  }
 
   static final _id_getUsableSpace = _class.instanceMethodId(
     r'getUsableSpace',
@@ -1497,12 +1423,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public long getUsableSpace()`
-  int getUsableSpace() {
-    return _getUsableSpace(
+  int getUsableSpace() => _getUsableSpace(
       reference.pointer,
       _id_getUsableSpace as jni$_.JMethodIDPtr,
     ).long;
-  }
 
   static final _id_createTempFile = _class.staticMethodId(
     r'createTempFile',
@@ -1678,12 +1602,10 @@ class File extends jni$_.JObject {
           >();
 
   /// from: `public int hashCode()`
-  int hashCode$1() {
-    return _hashCode$1(
+  int hashCode$1() => _hashCode$1(
       reference.pointer,
       _id_hashCode$1 as jni$_.JMethodIDPtr,
     ).integer;
-  }
 
   static final _id_toString$1 = _class.instanceMethodId(
     r'toString',
@@ -1708,12 +1630,10 @@ class File extends jni$_.JObject {
 
   /// from: `public java.lang.String toString()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? toString$1() {
-    return _toString$1(
+  jni$_.JString? toString$1() => _toString$1(
       reference.pointer,
       _id_toString$1 as jni$_.JMethodIDPtr,
     ).object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
 
   static final _id_toPath = _class.instanceMethodId(
     r'toPath',
@@ -1738,28 +1658,18 @@ class File extends jni$_.JObject {
 
   /// from: `public java.nio.file.Path toPath()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? toPath() {
-    return _toPath(
+  jni$_.JObject? toPath() => _toPath(
       reference.pointer,
       _id_toPath as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
-  bool operator <(File? file) {
-    return compareTo(file) < 0;
-  }
+  bool operator <(File? file) => compareTo(file) < 0;
 
-  bool operator <=(File? file) {
-    return compareTo(file) <= 0;
-  }
+  bool operator <=(File? file) => compareTo(file) <= 0;
 
-  bool operator >(File? file) {
-    return compareTo(file) > 0;
-  }
+  bool operator >(File? file) => compareTo(file) > 0;
 
-  bool operator >=(File? file) {
-    return compareTo(file) >= 0;
-  }
+  bool operator >=(File? file) => compareTo(file) >= 0;
 }
 
 final class $File$NullableType extends jni$_.JObjType<File?> {
@@ -1790,10 +1700,8 @@ final class $File$NullableType extends jni$_.JObjType<File?> {
   int get hashCode => ($File$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($File$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($File$NullableType) &&
         other is $File$NullableType;
-  }
 }
 
 final class $File$Type extends jni$_.JObjType<File> {
@@ -1824,9 +1732,7 @@ final class $File$Type extends jni$_.JObjType<File> {
   int get hashCode => ($File$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($File$Type) && other is $File$Type;
-  }
+  bool operator ==(Object other) => other.runtimeType == ($File$Type) && other is $File$Type;
 }
 
 /// from: `androidx.camera.core.ImageCapture$Builder`
@@ -1867,11 +1773,9 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public void <init>()`
   /// The returned object must be released after use, by calling the [release] method.
-  factory ImageCapture$Builder() {
-    return ImageCapture$Builder.fromReference(
+  factory ImageCapture$Builder() => ImageCapture$Builder.fromReference(
       _new$(_class.reference.pointer, _id_new$ as jni$_.JMethodIDPtr).reference,
     );
-  }
 
   static final _id_fromConfig = _class.staticMethodId(
     r'fromConfig',
@@ -1930,12 +1834,10 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.impl.MutableConfig getMutableConfig()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject getMutableConfig() {
-    return _getMutableConfig(
+  jni$_.JObject getMutableConfig() => _getMutableConfig(
       reference.pointer,
       _id_getMutableConfig as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject>(const jni$_.JObjectType());
-  }
 
   static final _id_getUseCaseConfig = _class.instanceMethodId(
     r'getUseCaseConfig',
@@ -1960,12 +1862,10 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.impl.ImageCaptureConfig getUseCaseConfig()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject getUseCaseConfig() {
-    return _getUseCaseConfig(
+  jni$_.JObject getUseCaseConfig() => _getUseCaseConfig(
       reference.pointer,
       _id_getUseCaseConfig as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject>(const jni$_.JObjectType());
-  }
 
   static final _id_build = _class.instanceMethodId(
     r'build',
@@ -1990,12 +1890,10 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture build()`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture build() {
-    return _build(
+  ImageCapture build() => _build(
       reference.pointer,
       _id_build as jni$_.JMethodIDPtr,
     ).object<ImageCapture>(const $ImageCapture$Type());
-  }
 
   static final _id_setCaptureMode = _class.instanceMethodId(
     r'setCaptureMode',
@@ -2022,13 +1920,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setCaptureMode(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setCaptureMode(int i) {
-    return _setCaptureMode(
+  ImageCapture$Builder setCaptureMode(int i) => _setCaptureMode(
       reference.pointer,
       _id_setCaptureMode as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setFlashMode = _class.instanceMethodId(
     r'setFlashMode',
@@ -2055,13 +1951,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setFlashMode(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setFlashMode(int i) {
-    return _setFlashMode(
+  ImageCapture$Builder setFlashMode(int i) => _setFlashMode(
       reference.pointer,
       _id_setFlashMode as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setBufferFormat = _class.instanceMethodId(
     r'setBufferFormat',
@@ -2088,13 +1982,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setBufferFormat(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setBufferFormat(int i) {
-    return _setBufferFormat(
+  ImageCapture$Builder setBufferFormat(int i) => _setBufferFormat(
       reference.pointer,
       _id_setBufferFormat as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setSupportedResolutions = _class.instanceMethodId(
     r'setSupportedResolutions',
@@ -2261,13 +2153,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setTargetAspectRatio(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setTargetAspectRatio(int i) {
-    return _setTargetAspectRatio(
+  ImageCapture$Builder setTargetAspectRatio(int i) => _setTargetAspectRatio(
       reference.pointer,
       _id_setTargetAspectRatio as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setTargetRotation = _class.instanceMethodId(
     r'setTargetRotation',
@@ -2294,13 +2184,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setTargetRotation(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setTargetRotation(int i) {
-    return _setTargetRotation(
+  ImageCapture$Builder setTargetRotation(int i) => _setTargetRotation(
       reference.pointer,
       _id_setTargetRotation as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setMirrorMode = _class.instanceMethodId(
     r'setMirrorMode',
@@ -2327,13 +2215,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setMirrorMode(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setMirrorMode(int i) {
-    return _setMirrorMode(
+  ImageCapture$Builder setMirrorMode(int i) => _setMirrorMode(
       reference.pointer,
       _id_setMirrorMode as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setTargetResolution = _class.instanceMethodId(
     r'setTargetResolution',
@@ -2532,13 +2418,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setSoftwareJpegEncoderRequested(boolean z)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setSoftwareJpegEncoderRequested(bool z) {
-    return _setSoftwareJpegEncoderRequested(
+  ImageCapture$Builder setSoftwareJpegEncoderRequested(bool z) => _setSoftwareJpegEncoderRequested(
       reference.pointer,
       _id_setSoftwareJpegEncoderRequested as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setFlashType = _class.instanceMethodId(
     r'setFlashType',
@@ -2565,13 +2449,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setFlashType(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setFlashType(int i) {
-    return _setFlashType(
+  ImageCapture$Builder setFlashType(int i) => _setFlashType(
       reference.pointer,
       _id_setFlashType as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setJpegQuality = _class.instanceMethodId(
     r'setJpegQuality',
@@ -2598,13 +2480,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setJpegQuality(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setJpegQuality(int i) {
-    return _setJpegQuality(
+  ImageCapture$Builder setJpegQuality(int i) => _setJpegQuality(
       reference.pointer,
       _id_setJpegQuality as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setIoExecutor = _class.instanceMethodId(
     r'setIoExecutor',
@@ -2835,13 +2715,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setSurfaceOccupancyPriority(int i)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setSurfaceOccupancyPriority(int i) {
-    return _setSurfaceOccupancyPriority(
+  ImageCapture$Builder setSurfaceOccupancyPriority(int i) => _setSurfaceOccupancyPriority(
       reference.pointer,
       _id_setSurfaceOccupancyPriority as jni$_.JMethodIDPtr,
       i,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setUseCaseEventCallback = _class.instanceMethodId(
     r'setUseCaseEventCallback',
@@ -2902,13 +2780,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setZslDisabled(boolean z)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setZslDisabled(bool z) {
-    return _setZslDisabled(
+  ImageCapture$Builder setZslDisabled(bool z) => _setZslDisabled(
       reference.pointer,
       _id_setZslDisabled as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setHighResolutionDisabled = _class.instanceMethodId(
     r'setHighResolutionDisabled',
@@ -2935,13 +2811,11 @@ class ImageCapture$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Builder setHighResolutionDisabled(boolean z)`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Builder setHighResolutionDisabled(bool z) {
-    return _setHighResolutionDisabled(
+  ImageCapture$Builder setHighResolutionDisabled(bool z) => _setHighResolutionDisabled(
       reference.pointer,
       _id_setHighResolutionDisabled as jni$_.JMethodIDPtr,
       z ? 1 : 0,
     ).object<ImageCapture$Builder>(const $ImageCapture$Builder$Type());
-  }
 
   static final _id_setCaptureType = _class.instanceMethodId(
     r'setCaptureType',
@@ -3041,10 +2915,8 @@ final class $ImageCapture$Builder$NullableType
   int get hashCode => ($ImageCapture$Builder$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Builder$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Builder$NullableType) &&
         other is $ImageCapture$Builder$NullableType;
-  }
 }
 
 final class $ImageCapture$Builder$Type
@@ -3077,10 +2949,8 @@ final class $ImageCapture$Builder$Type
   int get hashCode => ($ImageCapture$Builder$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Builder$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Builder$Type) &&
         other is $ImageCapture$Builder$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$CaptureMode`
@@ -3108,12 +2978,10 @@ class ImageCapture$CaptureMode extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -3206,10 +3074,8 @@ final class $ImageCapture$CaptureMode$NullableType
   int get hashCode => ($ImageCapture$CaptureMode$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$CaptureMode$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$CaptureMode$NullableType) &&
         other is $ImageCapture$CaptureMode$NullableType;
-  }
 }
 
 final class $ImageCapture$CaptureMode$Type
@@ -3242,10 +3108,8 @@ final class $ImageCapture$CaptureMode$Type
   int get hashCode => ($ImageCapture$CaptureMode$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$CaptureMode$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$CaptureMode$Type) &&
         other is $ImageCapture$CaptureMode$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$Defaults`
@@ -3286,11 +3150,9 @@ class ImageCapture$Defaults extends jni$_.JObject {
 
   /// from: `public void <init>()`
   /// The returned object must be released after use, by calling the [release] method.
-  factory ImageCapture$Defaults() {
-    return ImageCapture$Defaults.fromReference(
+  factory ImageCapture$Defaults() => ImageCapture$Defaults.fromReference(
       _new$(_class.reference.pointer, _id_new$ as jni$_.JMethodIDPtr).reference,
     );
-  }
 
   static final _id_getConfig = _class.instanceMethodId(
     r'getConfig',
@@ -3315,12 +3177,10 @@ class ImageCapture$Defaults extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.impl.ImageCaptureConfig getConfig()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject getConfig() {
-    return _getConfig(
+  jni$_.JObject getConfig() => _getConfig(
       reference.pointer,
       _id_getConfig as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject>(const jni$_.JObjectType());
-  }
 }
 
 final class $ImageCapture$Defaults$NullableType
@@ -3352,10 +3212,8 @@ final class $ImageCapture$Defaults$NullableType
   int get hashCode => ($ImageCapture$Defaults$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Defaults$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Defaults$NullableType) &&
         other is $ImageCapture$Defaults$NullableType;
-  }
 }
 
 final class $ImageCapture$Defaults$Type
@@ -3388,10 +3246,8 @@ final class $ImageCapture$Defaults$Type
   int get hashCode => ($ImageCapture$Defaults$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Defaults$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Defaults$Type) &&
         other is $ImageCapture$Defaults$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$FlashMode`
@@ -3419,12 +3275,10 @@ class ImageCapture$FlashMode extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -3515,10 +3369,8 @@ final class $ImageCapture$FlashMode$NullableType
   int get hashCode => ($ImageCapture$FlashMode$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$FlashMode$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$FlashMode$NullableType) &&
         other is $ImageCapture$FlashMode$NullableType;
-  }
 }
 
 final class $ImageCapture$FlashMode$Type
@@ -3551,10 +3403,8 @@ final class $ImageCapture$FlashMode$Type
   int get hashCode => ($ImageCapture$FlashMode$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$FlashMode$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$FlashMode$Type) &&
         other is $ImageCapture$FlashMode$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$FlashType`
@@ -3582,12 +3432,10 @@ class ImageCapture$FlashType extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -3678,10 +3526,8 @@ final class $ImageCapture$FlashType$NullableType
   int get hashCode => ($ImageCapture$FlashType$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$FlashType$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$FlashType$NullableType) &&
         other is $ImageCapture$FlashType$NullableType;
-  }
 }
 
 final class $ImageCapture$FlashType$Type
@@ -3714,10 +3560,8 @@ final class $ImageCapture$FlashType$Type
   int get hashCode => ($ImageCapture$FlashType$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$FlashType$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$FlashType$Type) &&
         other is $ImageCapture$FlashType$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$ImageCaptureError`
@@ -3745,12 +3589,10 @@ class ImageCapture$ImageCaptureError extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -3849,11 +3691,9 @@ final class $ImageCapture$ImageCaptureError$NullableType
   int get hashCode => ($ImageCapture$ImageCaptureError$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$ImageCaptureError$NullableType) &&
         other is $ImageCapture$ImageCaptureError$NullableType;
-  }
 }
 
 final class $ImageCapture$ImageCaptureError$Type
@@ -3887,10 +3727,8 @@ final class $ImageCapture$ImageCaptureError$Type
   int get hashCode => ($ImageCapture$ImageCaptureError$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$ImageCaptureError$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$ImageCaptureError$Type) &&
         other is $ImageCapture$ImageCaptureError$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$Metadata`
@@ -3931,11 +3769,9 @@ class ImageCapture$Metadata extends jni$_.JObject {
 
   /// from: `public void <init>()`
   /// The returned object must be released after use, by calling the [release] method.
-  factory ImageCapture$Metadata() {
-    return ImageCapture$Metadata.fromReference(
+  factory ImageCapture$Metadata() => ImageCapture$Metadata.fromReference(
       _new$(_class.reference.pointer, _id_new$ as jni$_.JMethodIDPtr).reference,
     );
-  }
 
   static final _id_isReversedHorizontal = _class.instanceMethodId(
     r'isReversedHorizontal',
@@ -3959,12 +3795,10 @@ class ImageCapture$Metadata extends jni$_.JObject {
           >();
 
   /// from: `public boolean isReversedHorizontal()`
-  bool isReversedHorizontal() {
-    return _isReversedHorizontal(
+  bool isReversedHorizontal() => _isReversedHorizontal(
       reference.pointer,
       _id_isReversedHorizontal as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_isReversedHorizontalSet = _class.instanceMethodId(
     r'isReversedHorizontalSet',
@@ -3988,12 +3822,10 @@ class ImageCapture$Metadata extends jni$_.JObject {
           >();
 
   /// from: `public boolean isReversedHorizontalSet()`
-  bool isReversedHorizontalSet() {
-    return _isReversedHorizontalSet(
+  bool isReversedHorizontalSet() => _isReversedHorizontalSet(
       reference.pointer,
       _id_isReversedHorizontalSet as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_setReversedHorizontal = _class.instanceMethodId(
     r'setReversedHorizontal',
@@ -4049,12 +3881,10 @@ class ImageCapture$Metadata extends jni$_.JObject {
           >();
 
   /// from: `public boolean isReversedVertical()`
-  bool isReversedVertical() {
-    return _isReversedVertical(
+  bool isReversedVertical() => _isReversedVertical(
       reference.pointer,
       _id_isReversedVertical as jni$_.JMethodIDPtr,
     ).boolean;
-  }
 
   static final _id_setReversedVertical = _class.instanceMethodId(
     r'setReversedVertical',
@@ -4111,12 +3941,10 @@ class ImageCapture$Metadata extends jni$_.JObject {
 
   /// from: `public android.location.Location getLocation()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getLocation() {
-    return _getLocation(
+  jni$_.JObject? getLocation() => _getLocation(
       reference.pointer,
       _id_getLocation as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_setLocation = _class.instanceMethodId(
     r'setLocation',
@@ -4174,12 +4002,10 @@ class ImageCapture$Metadata extends jni$_.JObject {
 
   /// from: `public java.lang.String toString()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString toString$1() {
-    return _toString$1(
+  jni$_.JString toString$1() => _toString$1(
       reference.pointer,
       _id_toString$1 as jni$_.JMethodIDPtr,
     ).object<jni$_.JString>(const jni$_.JStringType());
-  }
 }
 
 final class $ImageCapture$Metadata$NullableType
@@ -4211,10 +4037,8 @@ final class $ImageCapture$Metadata$NullableType
   int get hashCode => ($ImageCapture$Metadata$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Metadata$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Metadata$NullableType) &&
         other is $ImageCapture$Metadata$NullableType;
-  }
 }
 
 final class $ImageCapture$Metadata$Type
@@ -4247,10 +4071,8 @@ final class $ImageCapture$Metadata$Type
   int get hashCode => ($ImageCapture$Metadata$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Metadata$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Metadata$Type) &&
         other is $ImageCapture$Metadata$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$OnImageCapturedCallback`
@@ -4374,11 +4196,9 @@ final class $ImageCapture$OnImageCapturedCallback$NullableType
       ($ImageCapture$OnImageCapturedCallback$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OnImageCapturedCallback$NullableType) &&
         other is $ImageCapture$OnImageCapturedCallback$NullableType;
-  }
 }
 
 final class $ImageCapture$OnImageCapturedCallback$Type
@@ -4413,10 +4233,8 @@ final class $ImageCapture$OnImageCapturedCallback$Type
   int get hashCode => ($ImageCapture$OnImageCapturedCallback$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$OnImageCapturedCallback$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$OnImageCapturedCallback$Type) &&
         other is $ImageCapture$OnImageCapturedCallback$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$OnImageSavedCallback`
@@ -4509,12 +4327,10 @@ class ImageCapture$OnImageSavedCallback extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -4628,13 +4444,9 @@ final class _$ImageCapture$OnImageSavedCallback
   final void Function(ImageCaptureException imageCaptureException) _onError;
   final bool onError$async;
 
-  void onImageSaved(ImageCapture$OutputFileResults outputFileResults) {
-    return _onImageSaved(outputFileResults);
-  }
+  void onImageSaved(ImageCapture$OutputFileResults outputFileResults) => _onImageSaved(outputFileResults);
 
-  void onError(ImageCaptureException imageCaptureException) {
-    return _onError(imageCaptureException);
-  }
+  void onError(ImageCaptureException imageCaptureException) => _onError(imageCaptureException);
 }
 
 final class $ImageCapture$OnImageSavedCallback$NullableType
@@ -4671,11 +4483,9 @@ final class $ImageCapture$OnImageSavedCallback$NullableType
       ($ImageCapture$OnImageSavedCallback$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OnImageSavedCallback$NullableType) &&
         other is $ImageCapture$OnImageSavedCallback$NullableType;
-  }
 }
 
 final class $ImageCapture$OnImageSavedCallback$Type
@@ -4709,10 +4519,8 @@ final class $ImageCapture$OnImageSavedCallback$Type
   int get hashCode => ($ImageCapture$OnImageSavedCallback$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$OnImageSavedCallback$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$OnImageSavedCallback$Type) &&
         other is $ImageCapture$OnImageSavedCallback$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$OutputFileOptions$Builder`
@@ -4915,14 +4723,12 @@ class ImageCapture$OutputFileOptions$Builder extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$OutputFileOptions build()`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$OutputFileOptions build() {
-    return _build(
+  ImageCapture$OutputFileOptions build() => _build(
       reference.pointer,
       _id_build as jni$_.JMethodIDPtr,
     ).object<ImageCapture$OutputFileOptions>(
       const $ImageCapture$OutputFileOptions$Type(),
     );
-  }
 }
 
 final class $ImageCapture$OutputFileOptions$Builder$NullableType
@@ -4960,11 +4766,9 @@ final class $ImageCapture$OutputFileOptions$Builder$NullableType
       ($ImageCapture$OutputFileOptions$Builder$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OutputFileOptions$Builder$NullableType) &&
         other is $ImageCapture$OutputFileOptions$Builder$NullableType;
-  }
 }
 
 final class $ImageCapture$OutputFileOptions$Builder$Type
@@ -4999,11 +4803,9 @@ final class $ImageCapture$OutputFileOptions$Builder$Type
   int get hashCode => ($ImageCapture$OutputFileOptions$Builder$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OutputFileOptions$Builder$Type) &&
         other is $ImageCapture$OutputFileOptions$Builder$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$OutputFileOptions`
@@ -5047,12 +4849,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public java.io.File getFile()`
   /// The returned object must be released after use, by calling the [release] method.
-  File? getFile() {
-    return _getFile(
+  File? getFile() => _getFile(
       reference.pointer,
       _id_getFile as jni$_.JMethodIDPtr,
     ).object<File?>(const $File$NullableType());
-  }
 
   static final _id_getContentResolver = _class.instanceMethodId(
     r'getContentResolver',
@@ -5077,12 +4877,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public android.content.ContentResolver getContentResolver()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getContentResolver() {
-    return _getContentResolver(
+  jni$_.JObject? getContentResolver() => _getContentResolver(
       reference.pointer,
       _id_getContentResolver as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_getSaveCollection = _class.instanceMethodId(
     r'getSaveCollection',
@@ -5107,12 +4905,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public android.net.Uri getSaveCollection()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getSaveCollection() {
-    return _getSaveCollection(
+  jni$_.JObject? getSaveCollection() => _getSaveCollection(
       reference.pointer,
       _id_getSaveCollection as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_getContentValues = _class.instanceMethodId(
     r'getContentValues',
@@ -5137,12 +4933,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public android.content.ContentValues getContentValues()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getContentValues() {
-    return _getContentValues(
+  jni$_.JObject? getContentValues() => _getContentValues(
       reference.pointer,
       _id_getContentValues as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_getOutputStream = _class.instanceMethodId(
     r'getOutputStream',
@@ -5167,12 +4961,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public java.io.OutputStream getOutputStream()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getOutputStream() {
-    return _getOutputStream(
+  jni$_.JObject? getOutputStream() => _getOutputStream(
       reference.pointer,
       _id_getOutputStream as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_getMetadata = _class.instanceMethodId(
     r'getMetadata',
@@ -5197,12 +4989,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCapture$Metadata getMetadata()`
   /// The returned object must be released after use, by calling the [release] method.
-  ImageCapture$Metadata getMetadata() {
-    return _getMetadata(
+  ImageCapture$Metadata getMetadata() => _getMetadata(
       reference.pointer,
       _id_getMetadata as jni$_.JMethodIDPtr,
     ).object<ImageCapture$Metadata>(const $ImageCapture$Metadata$Type());
-  }
 
   static final _id_toString$1 = _class.instanceMethodId(
     r'toString',
@@ -5227,12 +5017,10 @@ class ImageCapture$OutputFileOptions extends jni$_.JObject {
 
   /// from: `public java.lang.String toString()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString toString$1() {
-    return _toString$1(
+  jni$_.JString toString$1() => _toString$1(
       reference.pointer,
       _id_toString$1 as jni$_.JMethodIDPtr,
     ).object<jni$_.JString>(const jni$_.JStringType());
-  }
 }
 
 final class $ImageCapture$OutputFileOptions$NullableType
@@ -5267,11 +5055,9 @@ final class $ImageCapture$OutputFileOptions$NullableType
   int get hashCode => ($ImageCapture$OutputFileOptions$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OutputFileOptions$NullableType) &&
         other is $ImageCapture$OutputFileOptions$NullableType;
-  }
 }
 
 final class $ImageCapture$OutputFileOptions$Type
@@ -5305,10 +5091,8 @@ final class $ImageCapture$OutputFileOptions$Type
   int get hashCode => ($ImageCapture$OutputFileOptions$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$OutputFileOptions$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$OutputFileOptions$Type) &&
         other is $ImageCapture$OutputFileOptions$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture$OutputFileResults`
@@ -5385,12 +5169,10 @@ class ImageCapture$OutputFileResults extends jni$_.JObject {
 
   /// from: `public android.net.Uri getSavedUri()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getSavedUri() {
-    return _getSavedUri(
+  jni$_.JObject? getSavedUri() => _getSavedUri(
       reference.pointer,
       _id_getSavedUri as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 }
 
 final class $ImageCapture$OutputFileResults$NullableType
@@ -5425,11 +5207,9 @@ final class $ImageCapture$OutputFileResults$NullableType
   int get hashCode => ($ImageCapture$OutputFileResults$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType ==
+  bool operator ==(Object other) => other.runtimeType ==
             ($ImageCapture$OutputFileResults$NullableType) &&
         other is $ImageCapture$OutputFileResults$NullableType;
-  }
 }
 
 final class $ImageCapture$OutputFileResults$Type
@@ -5463,10 +5243,8 @@ final class $ImageCapture$OutputFileResults$Type
   int get hashCode => ($ImageCapture$OutputFileResults$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$OutputFileResults$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$OutputFileResults$Type) &&
         other is $ImageCapture$OutputFileResults$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCapture`
@@ -5659,12 +5437,10 @@ class ImageCapture extends jni$_.JObject {
           >();
 
   /// from: `public int getFlashMode()`
-  int getFlashMode() {
-    return _getFlashMode(
+  int getFlashMode() => _getFlashMode(
       reference.pointer,
       _id_getFlashMode as jni$_.JMethodIDPtr,
     ).integer;
-  }
 
   static final _id_setFlashMode = _class.instanceMethodId(
     r'setFlashMode',
@@ -5753,12 +5529,10 @@ class ImageCapture extends jni$_.JObject {
           >();
 
   /// from: `public int getTargetRotation()`
-  int getTargetRotation() {
-    return _getTargetRotation(
+  int getTargetRotation() => _getTargetRotation(
       reference.pointer,
       _id_getTargetRotation as jni$_.JMethodIDPtr,
     ).integer;
-  }
 
   static final _id_setTargetRotation = _class.instanceMethodId(
     r'setTargetRotation',
@@ -5814,12 +5588,10 @@ class ImageCapture extends jni$_.JObject {
           >();
 
   /// from: `public int getCaptureMode()`
-  int getCaptureMode() {
-    return _getCaptureMode(
+  int getCaptureMode() => _getCaptureMode(
       reference.pointer,
       _id_getCaptureMode as jni$_.JMethodIDPtr,
     ).integer;
-  }
 
   static final _id_getJpegQuality = _class.instanceMethodId(
     r'getJpegQuality',
@@ -5843,12 +5615,10 @@ class ImageCapture extends jni$_.JObject {
           >();
 
   /// from: `public int getJpegQuality()`
-  int getJpegQuality() {
-    return _getJpegQuality(
+  int getJpegQuality() => _getJpegQuality(
       reference.pointer,
       _id_getJpegQuality as jni$_.JMethodIDPtr,
     ).integer;
-  }
 
   static final _id_getResolutionInfo = _class.instanceMethodId(
     r'getResolutionInfo',
@@ -5873,12 +5643,10 @@ class ImageCapture extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ResolutionInfo getResolutionInfo()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getResolutionInfo() {
-    return _getResolutionInfo(
+  jni$_.JObject? getResolutionInfo() => _getResolutionInfo(
       reference.pointer,
       _id_getResolutionInfo as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_getResolutionSelector = _class.instanceMethodId(
     r'getResolutionSelector',
@@ -5903,12 +5671,10 @@ class ImageCapture extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.resolutionselector.ResolutionSelector getResolutionSelector()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject? getResolutionSelector() {
-    return _getResolutionSelector(
+  jni$_.JObject? getResolutionSelector() => _getResolutionSelector(
       reference.pointer,
       _id_getResolutionSelector as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject?>(const jni$_.JObjectNullableType());
-  }
 
   static final _id_takePicture = _class.instanceMethodId(
     r'takePicture',
@@ -6052,12 +5818,10 @@ class ImageCapture extends jni$_.JObject {
 
   /// from: `public java.lang.String toString()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString toString$1() {
-    return _toString$1(
+  jni$_.JString toString$1() => _toString$1(
       reference.pointer,
       _id_toString$1 as jni$_.JMethodIDPtr,
     ).object<jni$_.JString>(const jni$_.JStringType());
-  }
 
   static final _id_onUnbind = _class.instanceMethodId(r'onUnbind', r'()V');
 
@@ -6128,14 +5892,12 @@ class ImageCapture extends jni$_.JObject {
 
   /// from: `public java.util.Set<java.lang.Integer> getSupportedEffectTargets()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JSet<jni$_.JInteger?> getSupportedEffectTargets() {
-    return _getSupportedEffectTargets(
+  jni$_.JSet<jni$_.JInteger?> getSupportedEffectTargets() => _getSupportedEffectTargets(
       reference.pointer,
       _id_getSupportedEffectTargets as jni$_.JMethodIDPtr,
     ).object<jni$_.JSet<jni$_.JInteger?>>(
       const jni$_.JSetType<jni$_.JInteger?>(jni$_.JIntegerNullableType()),
     );
-  }
 
   static final _id_getRealtimeCaptureLatencyEstimate = _class.instanceMethodId(
     r'getRealtimeCaptureLatencyEstimate',
@@ -6160,12 +5922,10 @@ class ImageCapture extends jni$_.JObject {
 
   /// from: `public androidx.camera.core.ImageCaptureLatencyEstimate getRealtimeCaptureLatencyEstimate()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JObject getRealtimeCaptureLatencyEstimate() {
-    return _getRealtimeCaptureLatencyEstimate(
+  jni$_.JObject getRealtimeCaptureLatencyEstimate() => _getRealtimeCaptureLatencyEstimate(
       reference.pointer,
       _id_getRealtimeCaptureLatencyEstimate as jni$_.JMethodIDPtr,
     ).object<jni$_.JObject>(const jni$_.JObjectType());
-  }
 }
 
 final class $ImageCapture$NullableType extends jni$_.JObjType<ImageCapture?> {
@@ -6196,10 +5956,8 @@ final class $ImageCapture$NullableType extends jni$_.JObjType<ImageCapture?> {
   int get hashCode => ($ImageCapture$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$NullableType) &&
         other is $ImageCapture$NullableType;
-  }
 }
 
 final class $ImageCapture$Type extends jni$_.JObjType<ImageCapture> {
@@ -6231,10 +5989,8 @@ final class $ImageCapture$Type extends jni$_.JObjType<ImageCapture> {
   int get hashCode => ($ImageCapture$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCapture$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCapture$Type) &&
         other is $ImageCapture$Type;
-  }
 }
 
 /// from: `androidx.camera.core.ImageCaptureException`
@@ -6327,12 +6083,10 @@ class ImageCaptureException extends jni$_.JObject {
           >();
 
   /// from: `public int getImageCaptureError()`
-  int getImageCaptureError() {
-    return _getImageCaptureError(
+  int getImageCaptureError() => _getImageCaptureError(
       reference.pointer,
       _id_getImageCaptureError as jni$_.JMethodIDPtr,
     ).integer;
-  }
 }
 
 final class $ImageCaptureException$NullableType
@@ -6364,10 +6118,8 @@ final class $ImageCaptureException$NullableType
   int get hashCode => ($ImageCaptureException$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCaptureException$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCaptureException$NullableType) &&
         other is $ImageCaptureException$NullableType;
-  }
 }
 
 final class $ImageCaptureException$Type
@@ -6400,10 +6152,8 @@ final class $ImageCaptureException$Type
   int get hashCode => ($ImageCaptureException$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($ImageCaptureException$Type) &&
+  bool operator ==(Object other) => other.runtimeType == ($ImageCaptureException$Type) &&
         other is $ImageCaptureException$Type;
-  }
 }
 
 /// from: `java.util.concurrent.Executor`
@@ -6461,12 +6211,10 @@ class Executor extends jni$_.JObject {
     int port,
     jni$_.JObjectPtr descriptor,
     jni$_.JObjectPtr args,
-  ) {
-    return _$invokeMethod(
+  ) => _$invokeMethod(
       port,
       jni$_.MethodInvocation.fromAddresses(0, descriptor.address, args.address),
     );
-  }
 
   static final jni$_.Pointer<
     jni$_.NativeFunction<
@@ -6539,9 +6287,7 @@ final class _$Executor with $Executor {
   final void Function(jni$_.JObject? runnable) _execute;
   final bool execute$async;
 
-  void execute(jni$_.JObject? runnable) {
-    return _execute(runnable);
-  }
+  void execute(jni$_.JObject? runnable) => _execute(runnable);
 }
 
 final class $Executor$NullableType extends jni$_.JObjType<Executor?> {
@@ -6572,10 +6318,8 @@ final class $Executor$NullableType extends jni$_.JObjType<Executor?> {
   int get hashCode => ($Executor$NullableType).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($Executor$NullableType) &&
+  bool operator ==(Object other) => other.runtimeType == ($Executor$NullableType) &&
         other is $Executor$NullableType;
-  }
 }
 
 final class $Executor$Type extends jni$_.JObjType<Executor> {
@@ -6606,7 +6350,5 @@ final class $Executor$Type extends jni$_.JObjType<Executor> {
   int get hashCode => ($Executor$Type).hashCode;
 
   @core$_.override
-  bool operator ==(Object other) {
-    return other.runtimeType == ($Executor$Type) && other is $Executor$Type;
-  }
+  bool operator ==(Object other) => other.runtimeType == ($Executor$Type) && other is $Executor$Type;
 }

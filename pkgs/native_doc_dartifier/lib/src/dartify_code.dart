@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'prompts.dart';
 import 'public_abstractor.dart';
+import 'test.dart';
 
 Future<String> dartifyNativeCode(String sourceCode, String bindingsPath) async {
   final file = File(bindingsPath);
@@ -25,14 +26,14 @@ Future<String> dartifyNativeCode(String sourceCode, String bindingsPath) async {
   final bindings = await file.readAsString();
 
   final model = GenerativeModel(
-    model: 'gemini-1.5-flash-latest',
+    model: 'gemini-2.0-flash',
     apiKey: apiKey,
     generationConfig: GenerationConfig(
-      temperature: 0.1,
+      temperature: 0,
       topK: 64,
       topP: 0.95,
       maxOutputTokens: 8192,
-      responseMimeType: 'text/plain',
+      responseMimeType: 'application/json',
     ),
   );
 
@@ -40,39 +41,13 @@ Future<String> dartifyNativeCode(String sourceCode, String bindingsPath) async {
     sourceCode,
     generateBindingsSummary(bindings),
   );
+
   final content = [Content.text(prompt)];
-  print(prompt);
+
   final response = await model.generateContent(content);
+  final dartCode = Prompts.parseTranslateResponse(response.text ?? '');
 
-  return response.text?.trim() ?? '';
-}
+  final fixedDartCode = await analyzeAndFix(dartCode, bindingsPath);
 
-void main() async {
-  const code = '''public void onClick() {
-    ImageCapture.OutputFileOptions outputFileOptions =
-            new ImageCapture.OutputFileOptions.Builder(new File(...)).build();
-    imageCapture.takePicture(outputFileOptions, cameraExecutor,
-        new ImageCapture.OnImageSavedCallback() {
-            @Override
-            public void onImageSaved(ImageCapture.OutputFileResults outputFileResults) {
-                // insert your code here.
-            }
-            @Override
-            public void onError(ImageCaptureException error) {
-                // insert your code here.
-            }
-       }
-    );
-}
-''';
-  const bindingsPath =
-      '/home/marshelino/Native/pkgs/native_doc_dartifier/lib/src/camerax.dart';
-
-  try {
-    final dartCode = await dartifyNativeCode(code, bindingsPath);
-    print(dartCode);
-  } catch (e) {
-    stderr.writeln('Error: $e');
-    exit(1);
-  }
+  return fixedDartCode;
 }

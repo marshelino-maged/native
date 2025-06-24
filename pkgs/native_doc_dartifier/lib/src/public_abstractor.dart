@@ -10,8 +10,8 @@ import 'ast.dart';
 String generateBindingsSummary(String sourceCode) {
   final abstractor = PublicAbstractor();
   parseString(content: sourceCode).unit.visitChildren(abstractor);
-  final result = abstractor.getRepresentation();
-  return result.replaceAll('jni\$_.', '').replaceAll('core\$_.', '');
+  final summary = abstractor.getRepresentation();
+  return summary.replaceAll('jni\$_.', '').replaceAll('core\$_.', '');
 }
 
 class PublicAbstractor extends RecursiveAstVisitor<void> {
@@ -146,7 +146,7 @@ class PublicAbstractor extends RecursiveAstVisitor<void> {
     final buffer = StringBuffer();
 
     for (final classInfo in _classes.values) {
-      buffer.writeln(classInfo.toString());
+      buffer.writeln(classInfo.toDartLikeRepresentaion());
       buffer.writeln();
     }
     return buffer.toString();

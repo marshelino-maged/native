@@ -27,8 +27,7 @@ class Class {
       getters = [],
       setters = [];
 
-  @override
-  String toString() => '''
+  String toDartLikeRepresentaion() => '''
 ${isInterface ? 'interface ' : ''}${isAbstract ? 'abstract ' : ''}class $name ${extendedClass.isNotEmpty ? 'extends $extendedClass ' : ''}${implementedInterfaces.isNotEmpty ? 'implements ${implementedInterfaces.join(', ')} ' : ''}
 {
 ${constructors.map((c) => '${c.toString()};').join('\n')}
@@ -59,8 +58,7 @@ class Field {
 
   Field(this.name, this.type, {this.isStatic = false});
 
-  @override
-  String toString() => '${isStatic ? 'static ' : ''}$type $name';
+  String toDartLikeRepresentaion() => '${isStatic ? 'static ' : ''}$type $name';
 }
 
 class Method {
@@ -80,8 +78,7 @@ class Method {
     this.operatorKeyword = '',
   });
 
-  @override
-  String toString() {
+  String toDartLikeRepresentaion() {
     final staticPrefix = isStatic ? 'static ' : '';
     final operatorPrefix =
         operatorKeyword.isNotEmpty ? '$operatorKeyword ' : '';
@@ -99,8 +96,7 @@ class Constructor {
 
   Constructor(this.className, this.name, this.parameters, this.factoryKeyword);
 
-  @override
-  String toString() {
+  String toDartLikeRepresentaion() {
     final constructorName = name.isNotEmpty ? '$className.$name' : className;
     return '${factoryKeyword != null ? '$factoryKeyword ' : ''}'
         '$constructorName$parameters';
@@ -114,8 +110,7 @@ class Getter {
 
   Getter(this.name, this.returnType, this.isStatic);
 
-  @override
-  String toString() {
+  String toDartLikeRepresentaion() {
     final staticPrefix = isStatic ? 'static ' : '';
     return '$staticPrefix$returnType get $name';
   }
@@ -129,8 +124,7 @@ class Setter {
 
   Setter(this.name, this.parameterType, this.isStatic, this.parameter);
 
-  @override
-  String toString() {
+  String toDartLikeRepresentaion() {
     final staticPrefix = isStatic ? 'static ' : '';
     return '$staticPrefix$parameterType set $name($parameter)';
   }

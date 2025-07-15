@@ -1,7 +1,6 @@
 ## 0.15.0-wip
 
 - **Breaking Change**: Removed `exclude` from config.
-- Update to the latest lints.
 
 ## 0.14.2
 

@@ -21,6 +21,7 @@ int overloadedMethods() {
   },
   {
     'code': '''
+<<<<<<< HEAD
 int innerClassCall() {
     DoublingAccumulator acc1 = new DoublingAccumulator();
     acc1.add(10);
@@ -48,5 +49,34 @@ int identifiersSpecialCases(){
     return Example.has\$dollar\$sign() + Example._startsWithUnderscore();
 }''',
     'fileName': 'identifiers.dart',
+=======
+int implementInlineInterface() {
+    Runnable runnable = new Runnable() {
+        @Override
+        public int run() {
+            return 0;
+        }
+    };
+    return runnable.run();
+}''',
+    'fileName': 'implement_inline_interface.dart',
+  },
+  {
+    'code': '''
+public class RunnableClass implements Runnable {
+
+  public RunnableClass() {}
+
+  @Override
+  public int run() {
+    return 5;
+  }
+}
+int implementNormalInterface() {
+    Runnable runnable = new RunnableClass();
+    return runnable.run();
+}''',
+    'fileName': 'implement_normal_interface.dart',
+>>>>>>> Fix-Format-Issue
   },
 ];

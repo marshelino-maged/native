@@ -38,28 +38,13 @@ JNIgen handles various syntactic and semantic differences between Java/Kotlin an
 
 * **Method Overloading:**
     * Java allows methods with the same name but different signatures (overloading). Dart does not.
-    * JNIgen resolves this by appending a dollar sign (`\$`) and a numeric suffix (e.g., `methodName\$1`, `methodName\$2`) to overloaded methods in the Dart bindings.
-    * **Always refer to overloaded methods using their JNIgen-generated, dollar-suffixed names as found in the provided `Bindings Summary`.**
+    * JNIgen resolves this by appending some sign or renaming it.
+    * **Always refer to the right method using their correct parameters as found in the provided `Bindings Summary`.**
 
 * **Fields and Methods with Same Name:**
     * Java allows a field and a method to have the same name. Dart does not.
-    * JNIgen resolves this by keeping the field name as-is, and appending a dollar sign (`\$`) and a numeric suffix to the method name (e.g., `fieldName` for the field, `methodName\$1` for the method).
+    * JNIgen resolves this by appending some sign or renaming it.
     * **Prioritize using the JNIgen-generated names for both fields and methods as defined in the `Bindings Summary`
-
-* **Identifiers Containing Dollar Signs (`\$`):**
-    * Java identifiers can contain dollar signs, while JNIgen uses them for its own renaming.
-    * To prevent collision, JNIgen replaces each single dollar sign in original Java identifiers with two dollar signs (e.g., `original\$name` becomes `original\$\$name`).
-    * **Use the double-dollar sign convention for Java identifiers that originally contained a single dollar sign, as reflected in the `Bindings Summary`.**
-
-* **Identifiers Starting with Underscore (`_`):**
-    * Dart identifiers starting with an underscore are private to their library.
-    * To keep public Java identifiers starting with an underscore accessible in Dart, JNIgen prepends them with an additional dollar sign (e.g., `_javaMethod` becomes `\$_javaMethod`).
-    * **Ensure to use the `\$`-prepended name for Java public identifiers that start with an underscore, as seen in the `Bindings Summary`.**
-
-* **Inner Classes:**
-    * Java has inner classes; Dart does not.
-    * JNIgen converts Java inner classes into separate top-level Dart classes. Their names are formed by concatenating the outer class name, a dollar sign (`\$`), and the inner class name (e.g., `Outer\$Inner`).
-    * **When referencing inner classes, use their JNIgen-generated flattened name (e.g., `Outer\$Inner`) as provided in the `Bindings Summary`.**
 
 ## Key Translation Rules:
 
@@ -70,7 +55,7 @@ JNIgen handles various syntactic and semantic differences between Java/Kotlin an
 * **Variable Declaration:** Use `final` for variables that are not reassigned.
 * **String Literals:** Use single quotes for all string literals in Dart.
 
-* **Implementing Java Interfaces (General):** When translating Java/Kotlin code that involves implementing a Java interface (e.g., `Runnable`), follow the JNIgen-generated Dart patterns.
+* **Implementing Java Interfaces (General):** When translating Java/Kotlin code that involves implementing a Java interface, follow the JNIgen-generated Dart patterns.
     * **Inline/Anonymous Class Implementation:**
         * Translate Java/Kotlin anonymous class implementations or lambdas into the Dart `InterfaceName.implement(\$InterfaceName(...))` syntax.
         * Pass each interface method as a named closure argument within the `\$InterfaceName` factory constructor.

@@ -7,7 +7,7 @@ import '../bindings.dart';
 bool backAndForthStrings() {
   final name = 'World'.toJString();
   final example = Example();
-  final greeting = example.greet(name)?.toDartString();
-  print(greeting);
-  return greeting == 'Hello World';
+  final greeting = example.greet(name);
+  print(greeting?.toDartString());
+  return greeting?.toDartString() == 'Hello World';
 }

@@ -8,3 +8,5 @@ source_path:
 
 classes:
   - "com"
+  - "java.io"
+  - "java.time"

@@ -57,12 +57,16 @@ void compileJavaPackage() {
 }
 
 void generateDartSnippets() async {
+  var firstTime = true;
   for (final snippet in snippets) {
     final sourceCode = snippet['code'] as String;
     final dartCode = await dartifyNativeCode(
       sourceCode,
       File(bindingsPath).absolute.path,
+      useRAG: true,
+      firstTime: firstTime,
     );
+    firstTime = false;
     final fileName = snippet['fileName'];
     final outputFile = File('$workingDir/$dartifiedSnippetsDir/$fileName');
     if (!outputFile.parent.existsSync()) {
@@ -87,10 +91,10 @@ import '../bindings.dart';
 
 void main() {
   try {
-    print('Generating bindings...');
-    generateBindings();
-    print('Compiling Java package...');
-    compileJavaPackage();
+    // print('Generating bindings...');
+    // generateBindings();
+    // print('Compiling Java package...');
+    // compileJavaPackage();
     print('Generating Dart snippets...');
     generateDartSnippets();
   } catch (e) {

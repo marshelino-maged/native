@@ -9,10 +9,13 @@ import 'code_processor.dart';
 import 'prompts.dart';
 import 'public_abstractor.dart';
 
+bool firstTime = true;
+
 Future<String> dartifyNativeCode(
   String sourceCode,
   String bindingsPath, {
   bool useRAG = false,
+  bool firstTime = true,
 }) async {
   final bindingsFile = File(bindingsPath);
 
@@ -49,32 +52,59 @@ Future<String> dartifyNativeCode(
   ]);
   print('Total Bindings Tokens: ${tokenCount.totalTokens}');
 
+  String? ragSummary;
   if (useRAG) {
-    final embededContent = await model.batchEmbedContents(
-      List.generate(
-        bindingsSummary.length,
-        (index) => EmbedContentRequest(Content.text(bindingsSummary[index])),
-      ),
-    );
-
-    final embeddings =
-        embededContent.embeddings.map((embedding) => embedding.values).toList();
-
     final client = ChromaClient();
-    final collection = await client.createCollection(name: 'test');
-    await collection.add(
-      ids: List.generate(
-        bindingsSummary.length,
-        (index) => (index + 1).toString(),
-      ),
-      embeddings: embeddings,
-      documents: bindingsSummary,
+    final collection = await client.getCollection(name: 'bindings');
+    final embeddingModel = GenerativeModel(
+      apiKey: apiKey,
+      model: 'gemini-embedding-001',
     );
 
-    print('Added ${bindingsSummary.length} documents to the collection.');
+    if (firstTime) {
+      const batchSize = 90;
+      final batchEmbededContent = <BatchEmbedContentsResponse>[];
+
+      for (var i = 0; i < bindingsSummary.length; i += batchSize) {
+        print('Processing batch from $i to ${i + batchSize}');
+        final batch = bindingsSummary.sublist(
+          i,
+          i + batchSize > bindingsSummary.length
+              ? bindingsSummary.length
+              : i + batchSize,
+        );
+
+        final batchResponse = await embeddingModel.batchEmbedContents(
+          List.generate(
+            batch.length,
+            (index) => EmbedContentRequest(Content.text(batch[index])),
+          ),
+        );
+
+        batchEmbededContent.add(batchResponse);
+      }
+
+      final embeddings = <List<double>>[];
+      for (final response in batchEmbededContent) {
+        for (final embedContent in response.embeddings) {
+          embeddings.add(embedContent.values);
+        }
+      }
+
+      await collection.add(
+        ids: List.generate(
+          bindingsSummary.length,
+          (index) => (index + 1).toString(),
+        ),
+        embeddings: embeddings,
+        documents: bindingsSummary,
+      );
+
+      print('Added ${bindingsSummary.length} documents to the collection.');
+    }
 
     print('Querying the collection...');
-    final queryEmbeddings = await model
+    final queryEmbeddings = await embeddingModel
         .embedContent(Content.text(sourceCode))
         .then((embedContent) => embedContent.embedding.values);
     final query = await collection.query(
@@ -82,16 +112,21 @@ Future<String> dartifyNativeCode(
       nResults: 10,
     );
 
-    final ragSummary = query.documents?.join('\n') ?? '';
-    print('RAG Summary: $ragSummary');
+    print('RAG Number of Classes: ${query.documents?.length}');
+    final tokenCount = await model.countTokens([
+      Content.text(query.documents!.join('\n')),
+    ]);
 
-    await client.deleteCollection(name: 'test');
-    return ragSummary;
+    print('RAG Bindings Tokens: ${tokenCount.totalTokens}');
+
+    ragSummary = query.documents!.join('\n');
+    print('Java Snippet: $sourceCode');
+    print('RAG Summary: $ragSummary');
   }
 
   final translatePrompt = TranslatePrompt(
     sourceCode,
-    bindingsSummary.join('\n'),
+    ragSummary ?? bindingsSummary.join('\n'),
   );
 
   final chatSession = model.startChat();
@@ -126,3 +161,9 @@ Future<String> dartifyNativeCode(
   mainCode = codeProcessor.removeImports(mainCode);
   return mainCode;
 }
+
+// void main() async {
+//   final client = ChromaClient();
+//   await client.createCollection(name: 'bindings');
+//   print('Finished');
+// }

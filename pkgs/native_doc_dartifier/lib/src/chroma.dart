@@ -1,15 +1,17 @@
-// Copyright (c) 2025, the Dart project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 import 'dart:io';
+
 import 'package:chromadb/chromadb.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+
 import 'code_processor.dart';
 import 'prompts.dart';
 import 'public_abstractor.dart';
 
-Future<String> dartifyNativeCode(
+// Test Large Context with RAG
+// First you need to get the docker image: docker pull chromadb/chroma:0.6.3
+// Then run it: docker run -p 8000:8000 chromadb/chroma:0.6.3
+
+Future<String> dartifyNativeCodeWithRAG(
   String sourceCode,
   String bindingsPath, {
   bool useRAG = false,

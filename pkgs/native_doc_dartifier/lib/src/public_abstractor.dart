@@ -7,11 +7,14 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'ast.dart';
 
-String generateBindingsSummary(String sourceCode) {
+List<String> generateBindingsSummary(String sourceCode) {
   final abstractor = PublicAbstractor();
   parseString(content: sourceCode).unit.visitChildren(abstractor);
-  final summary = abstractor.getRepresentation();
-  return summary.replaceAll('jni\$_.', '').replaceAll('core\$_.', '');
+  final classesSummary = abstractor.getRepresentation();
+  for (final classSummary in classesSummary) {
+    classSummary.replaceAll('jni\$_.', '').replaceAll('core\$_.', '');
+  }
+  return classesSummary;
 }
 
 class PublicAbstractor extends RecursiveAstVisitor<void> {
@@ -142,13 +145,13 @@ class PublicAbstractor extends RecursiveAstVisitor<void> {
     );
   }
 
-  String getRepresentation() {
-    final buffer = StringBuffer();
+  List<String> getRepresentation() {
+    final classRepresentations = <String>[];
 
     for (final classInfo in _classes.values) {
-      buffer.writeln(classInfo.toDartLikeRepresentaion());
-      buffer.writeln();
+      classRepresentations.add(classInfo.toDartLikeRepresentaion());
     }
-    return buffer.toString();
+
+    return classRepresentations;
   }
 }

@@ -64,7 +64,7 @@ void main(List<String> args) {
         'HookOutput',
         'LinkOutput',
       ],
-      visbleUnionTagValues: ['Asset'],
+      publicUnionTagValues: ['Asset'],
     ).analyze();
     final textDumpFile = File.fromUri(
       packageUri.resolve('../$packageName/lib/src/$packageName/syntax.g.txt'),
@@ -90,6 +90,7 @@ void main(List<String> args) {
 
     final output = SyntaxGenerator(
       analyzedSchema,
+      requireNullableParameters: true,
       header:
           '''
 // This file is generated, do not edit.

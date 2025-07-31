@@ -51,6 +51,7 @@ class GitPackageDescriptionSyntax extends PackageDescriptionSyntax {
     required String ref,
     required String resolvedRef,
     required String url,
+    super.path = const [],
   }) : super() {
     _path$ = path$;
     _ref = ref;
@@ -90,14 +91,23 @@ class GitPackageDescriptionSyntax extends PackageDescriptionSyntax {
 
   List<String> _validateRef() => _reader.validate<String>('ref');
 
-  String get resolvedRef => _reader.get<String>('resolved-ref');
+  static final _resolvedRefPattern = RegExp(r'^[a-f0-9]{40}$');
+
+  String get resolvedRef => _reader.string('resolved-ref', _resolvedRefPattern);
 
   set _resolvedRef(String value) {
+    if (!_resolvedRefPattern.hasMatch(value)) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'Value does not satisify pattern: ${_resolvedRefPattern.pattern}.',
+      );
+    }
     json.setOrRemove('resolved-ref', value);
   }
 
   List<String> _validateResolvedRef() =>
-      _reader.validate<String>('resolved-ref');
+      _reader.validateString('resolved-ref', _resolvedRefPattern);
 
   String get url => _reader.get<String>('url');
 
@@ -128,6 +138,7 @@ class HostedPackageDescriptionSyntax extends PackageDescriptionSyntax {
     required String name,
     required String sha256,
     required String url,
+    super.path = const [],
   }) : super() {
     _name = name;
     _sha256 = sha256;
@@ -148,21 +159,40 @@ class HostedPackageDescriptionSyntax extends PackageDescriptionSyntax {
     json.sortOnKey();
   }
 
-  String get name => _reader.get<String>('name');
+  static final _namePattern = RegExp(r'^[a-zA-Z_]\w*$');
+
+  String get name => _reader.string('name', _namePattern);
 
   set _name(String value) {
+    if (!_namePattern.hasMatch(value)) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'Value does not satisify pattern: ${_namePattern.pattern}.',
+      );
+    }
     json.setOrRemove('name', value);
   }
 
-  List<String> _validateName() => _reader.validate<String>('name');
+  List<String> _validateName() => _reader.validateString('name', _namePattern);
 
-  String get sha256 => _reader.get<String>('sha256');
+  static final _sha256Pattern = RegExp(r'^[a-f0-9]{64}$');
+
+  String get sha256 => _reader.string('sha256', _sha256Pattern);
 
   set _sha256(String value) {
+    if (!_sha256Pattern.hasMatch(value)) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'Value does not satisify pattern: ${_sha256Pattern.pattern}.',
+      );
+    }
     json.setOrRemove('sha256', value);
   }
 
-  List<String> _validateSha256() => _reader.validate<String>('sha256');
+  List<String> _validateSha256() =>
+      _reader.validateString('sha256', _sha256Pattern);
 
   String get url => _reader.get<String>('url');
 
@@ -193,6 +223,7 @@ class PackageSyntax extends JsonObjectSyntax {
     required PackageDescriptionSyntax description,
     required PackageSourceSyntax source,
     required String version,
+    super.path = const [],
   }) : super() {
     _dependency = dependency;
     _description = description;
@@ -243,13 +274,25 @@ class PackageSyntax extends JsonObjectSyntax {
 
   List<String> _validateSource() => _reader.validate<String>('source');
 
-  String get version => _reader.get<String>('version');
+  static final _versionPattern = RegExp(
+    r'^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?$',
+  );
+
+  String get version => _reader.string('version', _versionPattern);
 
   set _version(String value) {
+    if (!_versionPattern.hasMatch(value)) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'Value does not satisify pattern: ${_versionPattern.pattern}.',
+      );
+    }
     json.setOrRemove('version', value);
   }
 
-  List<String> _validateVersion() => _reader.validate<String>('version');
+  List<String> _validateVersion() =>
+      _reader.validateString('version', _versionPattern);
 
   @override
   List<String> validate() => [
@@ -268,7 +311,7 @@ class PackageDescriptionSyntax extends JsonObjectSyntax {
   PackageDescriptionSyntax.fromJson(super.json, {super.path = const []})
     : super.fromJson();
 
-  PackageDescriptionSyntax() : super();
+  PackageDescriptionSyntax({super.path = const []}) : super();
 
   @override
   List<String> validate() => [...super.validate()];
@@ -314,8 +357,11 @@ class PathPackageDescriptionSyntax extends PackageDescriptionSyntax {
   PathPackageDescriptionSyntax.fromJson(super.json, {super.path})
     : super.fromJson();
 
-  PathPackageDescriptionSyntax({required String path$, required bool relative})
-    : super() {
+  PathPackageDescriptionSyntax({
+    required String path$,
+    required bool relative,
+    super.path = const [],
+  }) : super() {
     _path$ = path$;
     _relative = relative;
     json.sortOnKey();
@@ -361,16 +407,22 @@ class PubspecLockFileSyntax extends JsonObjectSyntax {
     : super.fromJson();
 
   PubspecLockFileSyntax({
-    required Map<String, PackageSyntax>? packages,
+    Map<String, PackageSyntax>? packages,
     required SDKsSyntax sdks,
+    super.path = const [],
   }) : super() {
     _packages = packages;
     _sdks = sdks;
     json.sortOnKey();
   }
 
+  static final _packagesKeyPattern = RegExp(r'^[a-zA-Z_]\w*$');
+
   Map<String, PackageSyntax>? get packages {
-    final jsonValue = _reader.optionalMap('packages');
+    final jsonValue = _reader.optionalMap(
+      'packages',
+      keyPattern: _packagesKeyPattern,
+    );
     if (jsonValue == null) {
       return null;
     }
@@ -384,6 +436,7 @@ class PubspecLockFileSyntax extends JsonObjectSyntax {
   }
 
   set _packages(Map<String, PackageSyntax>? value) {
+    _checkArgumentMapKeys(value, keyPattern: _packagesKeyPattern);
     if (value == null) {
       json.remove('packages');
     } else {
@@ -394,7 +447,10 @@ class PubspecLockFileSyntax extends JsonObjectSyntax {
   }
 
   List<String> _validatePackages() {
-    final mapErrors = _reader.validateOptionalMap('packages');
+    final mapErrors = _reader.validateOptionalMap(
+      'packages',
+      keyPattern: _packagesKeyPattern,
+    );
     if (mapErrors.isNotEmpty) {
       return mapErrors;
     }
@@ -440,7 +496,7 @@ class PubspecLockFileSyntax extends JsonObjectSyntax {
 class SDKsSyntax extends JsonObjectSyntax {
   SDKsSyntax.fromJson(super.json, {super.path = const []}) : super.fromJson();
 
-  SDKsSyntax({required String dart}) : super() {
+  SDKsSyntax({required String dart, super.path = const []}) : super() {
     _dart = dart;
     json.sortOnKey();
   }
@@ -465,16 +521,16 @@ class JsonObjectSyntax {
 
   final List<Object> path;
 
-  JsonReader get _reader => JsonReader(json, path);
+  _JsonReader get _reader => _JsonReader(json, path);
 
-  JsonObjectSyntax() : json = {}, path = const [];
+  JsonObjectSyntax({this.path = const []}) : json = {};
 
   JsonObjectSyntax.fromJson(this.json, {this.path = const []});
 
   List<String> validate() => [];
 }
 
-class JsonReader {
+class _JsonReader {
   /// The JSON Object this reader is reading.
   final Map<String, Object?> json;
 
@@ -485,7 +541,7 @@ class JsonReader {
   /// This is used to give more precise error messages.
   final List<Object> path;
 
-  JsonReader(this.json, this.path);
+  _JsonReader(this.json, this.path);
 
   T get<T extends Object?>(String key) {
     final value = json[key];
@@ -553,24 +609,47 @@ class JsonReader {
     return result;
   }
 
-  Map<String, T> map$<T extends Object?>(String key) =>
-      _castMap<T>(get<Map<String, Object?>>(key), key);
+  Map<String, T> map$<T extends Object?>(String key, {RegExp? keyPattern}) {
+    final map = get<Map<String, Object?>>(key);
+    final keyErrors = _validateMapKeys(map, key, keyPattern: keyPattern);
+    if (keyErrors.isNotEmpty) {
+      throw FormatException(keyErrors.join('\n'));
+    }
+    return _castMap<T>(map, key);
+  }
 
-  List<String> validateMap<T extends Object?>(String key) {
+  List<String> validateMap<T extends Object?>(
+    String key, {
+    RegExp? keyPattern,
+  }) {
     final mapErrors = validate<Map<String, Object?>>(key);
     if (mapErrors.isNotEmpty) {
       return mapErrors;
     }
-    return _validateMapElements<T>(get<Map<String, Object?>>(key), key);
+    final map = get<Map<String, Object?>>(key);
+    return [
+      ..._validateMapKeys(map, key, keyPattern: keyPattern),
+      ..._validateMapElements<T>(map, key),
+    ];
   }
 
-  Map<String, T>? optionalMap<T extends Object?>(String key) =>
-      switch (get<Map<String, Object?>?>(key)) {
-        null => null,
-        final m => _castMap<T>(m, key),
-      };
+  Map<String, T>? optionalMap<T extends Object?>(
+    String key, {
+    RegExp? keyPattern,
+  }) {
+    final map = get<Map<String, Object?>?>(key);
+    if (map == null) return null;
+    final keyErrors = _validateMapKeys(map, key, keyPattern: keyPattern);
+    if (keyErrors.isNotEmpty) {
+      throw FormatException(keyErrors.join('\n'));
+    }
+    return _castMap<T>(map, key);
+  }
 
-  List<String> validateOptionalMap<T extends Object?>(String key) {
+  List<String> validateOptionalMap<T extends Object?>(
+    String key, {
+    RegExp? keyPattern,
+  }) {
     final mapErrors = validate<Map<String, Object?>?>(key);
     if (mapErrors.isNotEmpty) {
       return mapErrors;
@@ -579,7 +658,10 @@ class JsonReader {
     if (map == null) {
       return [];
     }
-    return _validateMapElements<T>(map, key);
+    return [
+      ..._validateMapKeys(map, key, keyPattern: keyPattern),
+      ..._validateMapElements<T>(map, key),
+    ];
   }
 
   /// [Map.cast] but with [FormatException]s.
@@ -595,6 +677,23 @@ class JsonReader {
     return map_.cast();
   }
 
+  List<String> _validateMapKeys(
+    Map<String, Object?> map_,
+    String parentKey, {
+    required RegExp? keyPattern,
+  }) {
+    if (keyPattern == null) return [];
+    final result = <String>[];
+    for (final key in map_.keys) {
+      if (!keyPattern.hasMatch(key)) {
+        result.add(
+          keyErrorString(key, pattern: keyPattern, pathExtension: [parentKey]),
+        );
+      }
+    }
+    return result;
+  }
+
   List<String> _validateMapElements<T extends Object?>(
     Map<String, Object?> map_,
     String parentKey,
@@ -606,6 +705,70 @@ class JsonReader {
       }
     }
     return result;
+  }
+
+  List<String> validateMapStringElements<T extends Object?>(
+    Map<String, String?> map_,
+    String parentKey, {
+    RegExp? valuePattern,
+  }) {
+    final result = <String>[];
+    for (final MapEntry(:key, :value) in map_.entries) {
+      if (value != null &&
+          valuePattern != null &&
+          !valuePattern.hasMatch(value)) {
+        result.add(
+          errorString(value, T, [parentKey, key], pattern: valuePattern),
+        );
+      }
+    }
+    return result;
+  }
+
+  String string(String key, RegExp? pattern) {
+    final value = get<String>(key);
+    if (pattern != null && !pattern.hasMatch(value)) {
+      throwFormatException(value, String, [key], pattern: pattern);
+    }
+    return value;
+  }
+
+  String? optionalString(String key, RegExp? pattern) {
+    final value = get<String?>(key);
+    if (value == null) return null;
+    if (pattern != null && !pattern.hasMatch(value)) {
+      throwFormatException(value, String, [key], pattern: pattern);
+    }
+    return value;
+  }
+
+  List<String> validateString(String key, RegExp? pattern) {
+    final errors = validate<String>(key);
+    if (errors.isNotEmpty) {
+      return errors;
+    }
+    final value = get<String>(key);
+    if (pattern != null && !pattern.hasMatch(value)) {
+      return [
+        errorString(value, String, [key], pattern: pattern),
+      ];
+    }
+    return [];
+  }
+
+  List<String> validateOptionalString(String key, RegExp? pattern) {
+    final errors = validate<String?>(key);
+    if (errors.isNotEmpty) {
+      return errors;
+    }
+    final value = get<String?>(key);
+    if (value == null) return [];
+    if (pattern != null && !pattern.hasMatch(value)) {
+      return [
+        errorString(value, String, [key], pattern: pattern),
+      ];
+    }
+    return [];
   }
 
   List<String>? optionalStringList(String key) => optionalList<String>(key);
@@ -653,23 +816,38 @@ class JsonReader {
   Never throwFormatException(
     Object? value,
     Type expectedType,
-    List<Object> pathExtension,
-  ) {
-    throw FormatException(errorString(value, expectedType, pathExtension));
+    List<Object> pathExtension, {
+    RegExp? pattern,
+  }) {
+    throw FormatException(
+      errorString(value, expectedType, pathExtension, pattern: pattern),
+    );
   }
 
   String errorString(
     Object? value,
     Type expectedType,
-    List<Object> pathExtension,
-  ) {
+    List<Object> pathExtension, {
+    RegExp? pattern,
+  }) {
     final pathString = _jsonPathToString(pathExtension);
     if (value == null) {
       return "No value was provided for '$pathString'."
           ' Expected a $expectedType.';
     }
+    final satisfying = pattern == null ? '' : ' satisfying ${pattern.pattern}';
     return "Unexpected value '$value' (${value.runtimeType}) for '$pathString'."
-        ' Expected a $expectedType.';
+        ' Expected a $expectedType$satisfying.';
+  }
+
+  String keyErrorString(
+    String key, {
+    required RegExp pattern,
+    List<Object> pathExtension = const [],
+  }) {
+    final pathString = _jsonPathToString(pathExtension);
+    return "Unexpected key '$key' in '$pathString'."
+        ' Expected a key satisfying ${pattern.pattern}.';
   }
 
   /// Traverses a JSON path, returns `null` if the path cannot be traversed.
@@ -708,5 +886,37 @@ extension<K extends Comparable<K>, V extends Object?> on Map<K, V> {
     }
     clear();
     addAll(result);
+  }
+}
+
+void _checkArgumentMapKeys(Map<String, Object?>? map, {RegExp? keyPattern}) {
+  if (map == null) return;
+  if (keyPattern == null) return;
+  for (final key in map.keys) {
+    if (!keyPattern.hasMatch(key)) {
+      throw ArgumentError.value(
+        map,
+        "Unexpected key '$key'."
+        ' Expected a key satisfying ${keyPattern.pattern}.',
+      );
+    }
+  }
+}
+
+void _checkArgumentMapStringElements(
+  Map<String, String?>? map, {
+  RegExp? valuePattern,
+}) {
+  if (map == null) return;
+  if (valuePattern == null) return;
+  for (final entry in map.entries) {
+    final value = entry.value;
+    if (value != null && !valuePattern.hasMatch(value)) {
+      throw ArgumentError.value(
+        map,
+        "Unexpected value '$value' under key '${entry.key}'."
+        ' Expected a value satisfying ${valuePattern.pattern}.',
+      );
+    }
   }
 }

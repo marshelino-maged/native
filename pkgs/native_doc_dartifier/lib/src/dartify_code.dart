@@ -67,6 +67,7 @@ Future<String> dartifyNativeCode(String sourceCode, String bindingsPath) async {
     final fixResponse = await chatSession.sendMessage(
       Content.text(fixPrompt.prompt),
     );
+
     final fixedCode = fixPrompt.getParsedResponse(fixResponse.text ?? '');
 
     mainCode = fixedCode.mainCode;

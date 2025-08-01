@@ -68,7 +68,9 @@ void generateDartSnippets() async {
     if (!outputFile.parent.existsSync()) {
       outputFile.parent.createSync(recursive: true);
     }
-    outputFile.writeAsStringSync('import \'../bindings.dart\';\n\n$dartCode');
+    outputFile.writeAsStringSync(
+      'import \'package:jni/jni.dart\';\nimport \'../bindings.dart\';\n\n$dartCode',
+    );
   }
 }
 

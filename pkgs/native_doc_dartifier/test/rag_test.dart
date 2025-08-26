@@ -1,26 +1,44 @@
 import 'dart:core';
 import 'dart:io';
 import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:chromadb/chromadb.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:native_doc_dartifier/src/public_abstractor.dart';
 import 'package:test/test.dart';
 
-Future<List<List<String?>>> queryChromaDB(
+import 'models.dart';
+import 'objectbox.g.dart';
+
+Future<List<String>> queryDB(
   String javaSnippet,
   GenerativeModel embeddingModel,
-  Collection collection,
 ) async {
+  final store = openStore();
+  final classSummaryBox = store.box<ClassSummaryModel>();
   final queryEmbeddings = await embeddingModel
       .embedContent(Content.text(javaSnippet))
       .then((embedContent) => embedContent.embedding.values);
 
-  final query = await collection.query(
-    queryEmbeddings: [queryEmbeddings],
-    nResults: 10,
-  );
+  // The Database makes use of HNSW algorithm for vector search which
+  // is O(log n) in search time complexity not O(n).
+  // but the tradeoff that it gets the approximate nearest neighbor
+  // instead of the exact one
+  // so make it to return approx 100 nearest neighbors and then get the top 10.
+  final query =
+      classSummaryBox
+          .query(
+            ClassSummaryModel_.embeddings.nearestNeighborsF32(
+              queryEmbeddings,
+              100,
+            ),
+          )
+          .build();
+  query.limit = 10;
+  final resultWithScore = query.findWithScores();
+  final result = resultWithScore.map((e) => e.object.summary).toList();
 
-  return query.documents!;
+  query.close();
+  store.close();
+  return result;
 }
 
 Future<void> main() async {
@@ -55,10 +73,10 @@ Future<void> main() async {
   ]);
   print('Total Bindings Tokens: ${tokenCount.totalTokens}');
 
-  // get embeddings of each class summary and add them to chromaDB
-  final client = ChromaClient();
+  // get embeddings of each class summary
+  final store = openStore();
+  final classSummaryBox = store.box<ClassSummaryModel>();
 
-  final collection = await client.getOrCreateCollection(name: 'bindings');
   final embeddingModel = GenerativeModel(
     apiKey: apiKey,
     model: 'gemini-embedding-001',
@@ -94,16 +112,13 @@ Future<void> main() async {
     }
   }
 
-  await collection.add(
-    ids: List.generate(
-      classesSummary.length,
-      (index) => (index + 1).toString(),
-    ),
-    embeddings: embeddings,
-    documents: classesSummary,
-  );
+  final classSummaries = <ClassSummaryModel>[];
+  for (var i = 0; i < classesSummary.length; i++) {
+    classSummaries.add(ClassSummaryModel(classesSummary[i], embeddings[i]));
+  }
+  classSummaryBox.putMany(classSummaries);
 
-  print('Added ${classesSummary.length} documents to the chromaDB.');
+  print('Added ${classesSummary.length} documents to the ObjectBox DB.');
 
   test('Snippet that uses Accumulator only', () async {
     const javaSnippet = '''
@@ -120,19 +135,15 @@ Boolean overloadedMethods() {
     return acc3.accumulator == 80;
 }
 ''';
-    final documents = await queryChromaDB(
-      javaSnippet,
-      embeddingModel,
-      collection,
-    );
+    final documents = await queryDB(javaSnippet, embeddingModel);
     final ragSummary = documents.join('\n');
 
-    expect(ragSummary.contains('class Accumulator'), isTrue);
-
     print('Query Results:');
-    for (var i = 0; i < documents[0].length; i++) {
-      print(documents[0][i]!.split('\n')[0]);
+    for (var i = 0; i < documents.length; i++) {
+      print(documents[i].split('\n')[0]);
     }
+
+    expect(ragSummary.contains('class Accumulator'), isTrue);
 
     final tokens = await geminiModel.countTokens([Content.text(ragSummary)]);
     print('Number of Tokens in the RAG Summary: ${tokens.totalTokens}');
@@ -145,19 +156,15 @@ Boolean useEnums() {
     Boolean isTrueUsage = example.enumValueToString(Operation.ADD) == "Addition";
     return isTrueUsage;
 }''';
-    final documents = await queryChromaDB(
-      javaSnippet,
-      embeddingModel,
-      collection,
-    );
+    final documents = await queryDB(javaSnippet, embeddingModel);
     final ragSummary = documents.join('\n');
 
-    expect(ragSummary.contains('class Example'), isTrue);
-
     print('Query Results:');
-    for (var i = 0; i < documents[0].length; i++) {
-      print(documents[0][i]!.split('\n')[0]);
+    for (var i = 0; i < documents.length; i++) {
+      print(documents[i].split('\n')[0]);
     }
+
+    expect(ragSummary.contains('class Example'), isTrue);
 
     final tokens = await geminiModel.countTokens([Content.text(ragSummary)]);
     print('Number of Tokens in the RAG Summary: ${tokens.totalTokens}');
@@ -179,21 +186,20 @@ public class ReadFile {
         }
     }
 }''';
-    final documents = await queryChromaDB(
-      javaSnippet,
-      embeddingModel,
-      collection,
-    );
+    final documents = await queryDB(javaSnippet, embeddingModel);
     final ragSummary = documents.join('\n');
+
+    print('Query Results:');
+    for (var i = 0; i < documents.length; i++) {
+      print(documents[i].split('\n')[0]);
+    }
 
     expect(ragSummary.contains('class FileReader'), isTrue);
     expect(ragSummary.contains('class BufferedReader'), isTrue);
 
-    print('Query Results:');
-    for (var i = 0; i < documents[0].length; i++) {
-      print(documents[0][i]!.split('\n')[0]);
-    }
     final tokens = await geminiModel.countTokens([Content.text(ragSummary)]);
     print('Number of Tokens in the RAG Summary: ${tokens.totalTokens}');
   });
+
+  store.close();
 }

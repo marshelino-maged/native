@@ -27,10 +27,11 @@ jobs:
         sdk: [stable]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046
         with:
           channel: ${{ matrix.sdk }}
+      - name: Download .so file
+        run: bash <(curl -s https://raw.githubusercontent.com/objectbox/objectbox-dart/main/install.sh)
       - id: install
         name: Install dependencies
         run: flutter pub get

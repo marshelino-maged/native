@@ -69,18 +69,16 @@ obx.Store openStore({
   int? maxReaders,
   bool queriesCaseSensitiveDefault = true,
   String? macosApplicationGroup,
-}) {
-  return obx.Store(
-    getObjectBoxModel(),
-    directory: directory,
-    maxDBSizeInKB: maxDBSizeInKB,
-    maxDataSizeInKB: maxDataSizeInKB,
-    fileMode: fileMode,
-    maxReaders: maxReaders,
-    queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
-    macosApplicationGroup: macosApplicationGroup,
-  );
-}
+}) => obx.Store(
+  getObjectBoxModel(),
+  directory: directory,
+  maxDBSizeInKB: maxDBSizeInKB,
+  maxDataSizeInKB: maxDataSizeInKB,
+  fileMode: fileMode,
+  maxReaders: maxReaders,
+  queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
+  macosApplicationGroup: macosApplicationGroup,
+);
 
 /// Returns the ObjectBox model definition for this project for use with
 /// [obx.Store.new].
@@ -100,7 +98,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     version: 1,
   );
 
-  final bindings = <Type, obx_int.EntityDefinition>{
+  final bindings = <Type, obx_int.EntityDefinition<ClassSummaryModel>>{
     ClassSummaryModel: obx_int.EntityDefinition<ClassSummaryModel>(
       model: _entities[0],
       toOneRelations: (ClassSummaryModel object) => [],

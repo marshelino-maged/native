@@ -7,7 +7,6 @@ on:
       - ".github/workflows/native_doc_dartifier.yaml"
       - "pkgs/native_doc_dartifier/**"
   pull_request:
-    branches: [main]
     paths:
       - ".github/workflows/native_doc_dartifier.yaml"
       - "pkgs/native_doc_dartifier/**"

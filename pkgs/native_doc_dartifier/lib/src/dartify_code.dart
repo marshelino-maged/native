@@ -19,7 +19,7 @@ Future<String> dartifyNativeCode(String sourceCode, Context context) async {
   }
 
   final model = GenerativeModel(
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash-lite',
     apiKey: apiKey,
     generationConfig: GenerationConfig(
       temperature: 0,

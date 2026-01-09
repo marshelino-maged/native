@@ -62,7 +62,7 @@ void generateDartSnippets() async {
     Directory.current.path,
     File(bindingsPath).absolute.path,
   );
-  int i = 0;
+  var i = 0;
   for (final snippet in snippets) {
     print('Dartifying snippet ${++i}/${snippets.length}...');
     final sourceCode = snippet['code'] as String;
